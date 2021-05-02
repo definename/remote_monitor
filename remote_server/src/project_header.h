@@ -12,3 +12,6 @@
 
 // Poco
 #include <Poco/LocalDateTime.h>
+#include <Poco/Util/ServerApplication.h>
+#include <Poco/FormattingChannel.h>
+#include <Poco/PatternFormatter.h>

@@ -47,8 +47,9 @@ include(${wxWidgets_USE_FILE})
 ###########################################################
 # Poco ####################################################
 
+set(POCO_PROJECT_NAME Poco)
 ExternalProject_Add(
-	Poco
+	${POCO_PROJECT_NAME}
 	URL "${OPENSOURCE_PATH}/poco-1.7.0-all.zip"
 	URL_MD5 C5F0EEC1EEDF84323E0991E911465D8D
 	CMAKE_ARGS
@@ -85,6 +86,7 @@ set(POCO_LIBRARIES
 	${POCO_ROOT}/lib/PocoUtil.lib
 	# ${POCO_ROOT}/lib/PocoNetSSL.lib
 	${POCO_ROOT}/lib/PocoXML.lib
+	Iphlpapi.lib # To prevent linkage error
 	)
 
 add_subdirectory(remote_server)

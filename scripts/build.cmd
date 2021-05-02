@@ -38,12 +38,12 @@ if errorlevel 1 %THEN%
 	goto :error_cmake_generate
 %ENDIF%
 
-set CMAKE_BUILD_COMMAND=--build . --config %BUILDTYPE% --target ALL_BUILD
-echo -- CMake build command: %CMAKE_BUILD_COMMAND%
-cmake %CMAKE_BUILD_COMMAND%
-if errorlevel 1 %THEN%
-	goto :error_cmake_build
-%ENDIF%
+REM set CMAKE_BUILD_COMMAND=--build . --config %BUILDTYPE% --target ALL_BUILD
+REM echo -- CMake build command: %CMAKE_BUILD_COMMAND%
+REM cmake %CMAKE_BUILD_COMMAND%
+REM if errorlevel 1 %THEN%
+	REM goto :error_cmake_build
+REM %ENDIF%
 
 popd
 
