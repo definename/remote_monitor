@@ -1,17 +1,18 @@
-project(remote_server)
+project(netlib)
 
 set(SOURCE_FILES
-	src/remote_server.cpp
+	src/netlib_server.cpp
 	)
 set(HEADER_FILES
-	src/remote_server.h
+	src/netlib_server.h
+	src/netlib_log.h
 	src/project_header.h
 	)
 
 source_group("Source files" FILES ${SOURCE_FILES})
 source_group("Header files" FILES ${HEADER_FILES})
 
-add_executable(${PROJECT_NAME}
+add_library(${PROJECT_NAME} STATIC
 	${SOURCE_FILES}
 	${HEADER_FILES}
 	)
@@ -24,16 +25,14 @@ target_include_directories(${PROJECT_NAME}
 	PRIVATE
 		${Boost_INCLUDE_DIRS}
 		${POCO_INCLUDE_DIR}
-		${NETLIB_INCLUDE_DIRS}
 		)
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE
 		${Boost_LIBRARIES}
 		${POCO_LIBRARIES}
-		${wxWidgets_LIBRARIES}
-		${NETLIB_LIBRARIES}
 		)
 add_dependencies(${PROJECT_NAME}
 	pocoproject
-	netlib
 	)
+set(NETLIB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/netlib/src PARENT_SCOPE)
+set(NETLIB_LIBRARIES ${PROJECT_NAME} PARENT_SCOPE)

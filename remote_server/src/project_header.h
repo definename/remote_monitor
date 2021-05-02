@@ -15,3 +15,5 @@
 #include <Poco/Util/ServerApplication.h>
 #include <Poco/FormattingChannel.h>
 #include <Poco/PatternFormatter.h>
+
+#include "netlib_server.h"
