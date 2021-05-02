@@ -2,6 +2,10 @@
 
 namespace server {
 
+void DoIt::Do() {
+	Poco::Logger::get("ApplicationStartup").information("it works");
+}
+
 void RemoteServer::initialize(Poco::Util::Application& self) {
 	logger().setLevel("trace");
 	Poco::AutoPtr<Poco::PatternFormatter> formatter =
@@ -9,6 +13,8 @@ void RemoteServer::initialize(Poco::Util::Application& self) {
 	Poco::AutoPtr<Poco::FormattingChannel> channel =
 		new Poco::FormattingChannel(formatter, logger().getChannel());
 	logger().setChannel(channel);
+
+	do_.Do();
 
 	ServerApplication::initialize(self);
 }
