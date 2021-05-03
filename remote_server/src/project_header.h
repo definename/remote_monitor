@@ -16,4 +16,11 @@
 #include <Poco/FormattingChannel.h>
 #include <Poco/PatternFormatter.h>
 
+// netlist
 #include "netlib_server.h"
+
+// zlib
+#include "zlib.h"
+
+// Protogen
+#include "Boss.pb.h"

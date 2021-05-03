@@ -24,16 +24,23 @@ target_include_directories(${PROJECT_NAME}
 	PRIVATE
 		${Boost_INCLUDE_DIRS}
 		${POCO_INCLUDE_DIR}
+		${ZLIB_INCLUDE_DIRS}
+		${Protobuf_INCLUDE_DIRS}
+		${Protogen_INCLUDE_DIRS}
 		${NETLIB_INCLUDE_DIRS}
 		)
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE
 		${Boost_LIBRARIES}
 		${POCO_LIBRARIES}
+		${ZLIB_LIBRARIES}
+		${Protobuf_LIBRARIES}
+		${Protogen_LIBRARIES}
 		${wxWidgets_LIBRARIES}
 		${NETLIB_LIBRARIES}
 		)
 add_dependencies(${PROJECT_NAME}
 	pocoproject
 	netlib
+	protogen
 	)

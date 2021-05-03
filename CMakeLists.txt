@@ -25,8 +25,10 @@ set(OPENSOURCE_PATH ${CMAKE_SOURCE_DIR}/opensource)
 set(PATCH_PATH ${OPENSOURCE_PATH}/patches)
 # Opensource install path
 set(OPENSOURCE_INSTALL_PATH ${CMAKE_BINARY_DIR}/opensource)
-# Poco root directory
+# Opensource root dirs
 set(POCO_ROOT ${OPENSOURCE_INSTALL_PATH}/Poco)
+set(ZLIB_ROOT ${OPENSOURCE_INSTALL_PATH}/zlib)
+set(Protobuf_ROOT ${OPENSOURCE_INSTALL_PATH}/protobuf)
 
 ###########################################################
 # Boost ###################################################
@@ -87,6 +89,74 @@ set(POCO_LIBRARIES
 	${POCO_ROOT}/lib/PocoXML.lib
 	Iphlpapi.lib # To prevent linkage error
 	)
+
+###########################################################
+# zlib ####################################################
+
+ExternalProject_Add(
+	zlib
+	URL "${OPENSOURCE_PATH}/zlib-1.2.8.zip"
+	URL_MD5 D34BAA0DA16E33A5EF095E7EEF7D2472
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX:PATH=${ZLIB_ROOT}
+		-DBUILD_SHARED_LIBS:BOOL=OFF
+		-DBUILD_WITH_MSVC_STATIC_RUNTIME_LIBRARY:BOOL=${BUILD_WITH_MSVC_STATIC_RUNTIME_LIBRARY}
+	PATCH_COMMAND 
+		${CMAKE_COMMAND} -P ${PATCH_PATH}/zlib-1.2.8.patches/patch.cmake ${CMAKE_SOURCE_DIR}
+	)
+
+set(ZLIB_INCLUDE_DIRS ${ZLIB_ROOT}/include)
+set(ZLIB_LIBRARIES
+	debug ${ZLIB_ROOT}/lib/zlibstaticd.lib
+	optimized ${ZLIB_ROOT}/lib/zlibstatic.lib
+	)
+
+############################################################
+# PROTOBUF-CPP #############################################
+
+ExternalProject_Add(
+	protobuf
+	DEPENDS
+		zlib
+	URL "${OPENSOURCE_PATH}/protobuf-cpp-3.7.1.zip"
+	URL_MD5 7d819ec1943f1fef3a85aaad32e122f4
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX:PATH=${Protobuf_ROOT}
+		-DZLIB_ROOT:PATH=${ZLIB_ROOT}
+		-Dprotobuf_BUILD_TESTS=OFF
+		-DBUILD_SHARED_LIBS=OFF
+		-Dprotobuf_VERBOSE=ON
+	SOURCE_SUBDIR cmake
+	PATCH_COMMAND
+		${CMAKE_COMMAND} -P ${PATCH_PATH}/protobuf-cpp-3.7.1.patches/patch.cmake ${CMAKE_SOURCE_DIR}
+	)
+set(Protobuf_INCLUDE_DIRS ${Protobuf_ROOT}/include)
+set(Protobuf_LIBRARIES
+	debug ${Protobuf_ROOT}/lib/libprotobufd.lib
+	optimized ${Protobuf_ROOT}/lib/libprotobuf.lib
+	)
+
+set(Protofiles_ROOT ${CMAKE_SOURCE_DIR}/protofiles)
+set(Protogen_ROOT ${OPENSOURCE_INSTALL_PATH}/protogen)
+set(Protogen_INCLUDE_DIRS ${Protogen_ROOT})
+set(Protogen_LIBRARIES ${Protogen_ROOT}/protogen.lib)
+ExternalProject_Add(
+	protogen
+	SOURCE_DIR ${OPENSOURCE_PATH}/protogen-1.0
+	DEPENDS
+		protobuf
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX:PATH=${Protogen_ROOT}
+		-DBUILD_WITH_MSVC_STATIC_RUNTIME_LIBRARY:BOOL=${BUILD_WITH_MSVC_STATIC_RUNTIME_LIBRARY}
+		-DProtobuf_ROOT=${Protobuf_ROOT}
+		-DProtofiles_ROOT=${Protofiles_ROOT}
+	)
+
+SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+SET_PROPERTY(TARGET pocoproject PROPERTY FOLDER "opensource")
+SET_PROPERTY(TARGET zlib PROPERTY FOLDER "opensource")
+SET_PROPERTY(TARGET protobuf PROPERTY FOLDER "opensource")
+SET_PROPERTY(TARGET protogen PROPERTY FOLDER "opensource")
 
 add_subdirectory(netlib)
 add_subdirectory(remote_server)

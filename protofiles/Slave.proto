@@ -1,0 +1,6 @@
+package Poor;
+
+message Slave
+{
+  optional int32 number = 1;
+};

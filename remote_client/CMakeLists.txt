@@ -16,3 +16,7 @@ target_link_libraries(${PROJECT_NAME}
 		${POCO_LIBRARIES}
 		${wxWidgets_LIBRARIES}
 		)
+add_dependencies(${PROJECT_NAME}
+	pocoproject
+	netlib
+	)
