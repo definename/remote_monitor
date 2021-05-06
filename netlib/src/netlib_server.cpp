@@ -1,14 +1,20 @@
-namespace netlib {
+#include "netlib_server.h"
 
-void do_something() {
-	NETLIB_FTL("hello from netlib");
-	NETLIB_CRT("hello from netlib");
-	NETLIB_ERR("hello from netlib");
-	NETLIB_WRN("hello from netlib");
-	NETLIB_NTC("hello from netlib");
-	NETLIB_INF("hello from netlib");
-	NETLIB_DBG("hello from netlib");
-	NETLIB_TRC("hello from netlib");
+namespace netlib
+{
+
+netlib_server::netlib_server()
+	: netlib_core(2)
+	, acceptor_(io_context_) {
+	run();
+}
+
+netlib_server::~netlib_server() {
+	try {
+		stop();
+	} catch (const std::exception& e) {
+		NETLIB_ERR_FMT("Server destruction error: %s", e.what());
+	}
 }
 
 }

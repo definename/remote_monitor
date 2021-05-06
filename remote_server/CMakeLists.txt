@@ -31,7 +31,7 @@ target_include_directories(${PROJECT_NAME}
 		)
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE
-		${Boost_LIBRARIES}
+		# ${Boost_LIBRARIES}
 		${POCO_LIBRARIES}
 		${ZLIB_LIBRARIES}
 		${Protobuf_LIBRARIES}
@@ -44,3 +44,4 @@ add_dependencies(${PROJECT_NAME}
 	netlib
 	protogen
 	)
+add_compile_definitions(WIN32_LEAN_AND_MEAN)

@@ -1,3 +1,5 @@
+#pragma once
+
 // STD
 #include <iostream>
 
@@ -8,7 +10,7 @@
 #endif 
 
 // Boost
-#include <boost/filesystem.hpp>
+#include "boost/asio.hpp"
 
 // Poco
 #include <Poco/LocalDateTime.h>
@@ -17,6 +19,7 @@
 #include <Poco/PatternFormatter.h>
 
 // netlist
+#include "netlib_core.h"
 #include "netlib_server.h"
 
 // zlib

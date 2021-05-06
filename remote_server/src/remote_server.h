@@ -3,14 +3,17 @@
 
 namespace server {
 
-class RemoteServer: public Poco::Util::ServerApplication {
+class remote_server: public Poco::Util::ServerApplication {
 public:
-	void initialize(Poco::Util::Application& self) override;
+	remote_server();
 	int main(const ArgVec& args) override;
+
+private:
+	std::shared_ptr<netlib::netlib_server> netlib_server_;
 };
 
 }
 
-POCO_SERVER_MAIN(server::RemoteServer)
+POCO_SERVER_MAIN(server::remote_server)
 
 #endif

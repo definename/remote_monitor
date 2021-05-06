@@ -1,9 +1,24 @@
-#ifndef NETLIB
-#define NETLIB
+#ifndef NETLIB_SERVER
+#define NETLIB_SERVER
 
-namespace netlib {
+#include "netlib_core.h"
 
-void do_something();
+namespace netlib
+{
+
+class netlib_server: public netlib_core
+{
+	// Construction and destruction.
+public:
+	//! Constructor.
+	netlib_server();
+	//! Destructor.
+	~netlib_server();
+
+	// Private members.
+private:
+	boost::asio::ip::tcp::acceptor acceptor_;
+};
 
 }
 

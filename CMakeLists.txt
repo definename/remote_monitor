@@ -37,7 +37,7 @@ cmake_policy(SET CMP0074 NEW)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME ${BUILD_WITH_MSVC_STATIC_RUNTIME_LIBRARY})
-find_package(Boost REQUIRED COMPONENTS serialization filesystem)
+find_package(Boost REQUIRED COMPONENTS serialization filesystem date_time regex)
 
 ###########################################################
 # wxWidgets ###############################################
