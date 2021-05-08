@@ -18,7 +18,7 @@ int remote_server::main(const ArgVec& args) {
 		logger().setChannel(channel);
 
 		logger().information("Server is being started...");
-		netlib_server_ = std::make_shared<netlib::netlib_server>();
+		netlib_server_ = std::make_shared<netlib::netlib_server>(49160);
 
 
 // 		std::cout << "zlib version: " << zlib_version << std::endl;
@@ -57,6 +57,7 @@ int remote_server::main(const ArgVec& args) {
 // 			}
 // 		}
 		waitForTerminationRequest();
+
 	} catch (const std::exception& e) {
 		logger().error("Error occurred: %s", e.what());
 	}

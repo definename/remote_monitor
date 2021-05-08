@@ -17,7 +17,7 @@ protected:
 	//! Starts.
 	void run();
 	//! Stops.
-	void stop();
+	virtual void stop();
 	//! Is running
 	bool is_running() const;
 

@@ -11,9 +11,19 @@ class netlib_server: public netlib_core
 	// Construction and destruction.
 public:
 	//! Constructor.
-	netlib_server();
+	netlib_server(const unsigned short port);
 	//! Destructor.
 	~netlib_server();
+
+public:
+	// Starts server
+	void start();
+	// Stops server
+	void stop() override;
+
+private:
+	// Accept new connection
+	void start_accept();
 
 	// Private members.
 private:
