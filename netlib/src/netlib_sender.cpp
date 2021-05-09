@@ -58,7 +58,6 @@ void netlib_sender::send(const netlib_session::sessionid_t& id, netlib_message::
 			std::unique_lock<std::mutex> l(mutex_);
 			sending_queue_.push({ msg, session });
 			cv_.notify_all();
-			NETLIB_INF("push to queue");
 		}
 	} catch (const std::exception& e) {
 		NETLIB_ERR_FMT("Failed to send message:%s", WHAT_TO_STR(e));

@@ -11,7 +11,7 @@ message Payload {
 }
 
 message Connect {
-	optional string session_id = 1;
+	required string session_id = 1;
 	optional bool ready = 2 [default = false];
 }
 

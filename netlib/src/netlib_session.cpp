@@ -38,4 +38,8 @@ netlib_session::sessionid_t netlib_session::session_id() const {
 	return session_id_;
 }
 
+void netlib_session::set_session_id(const netlib_session::sessionid_t& id) {
+	session_id_ = id;
+}
+
 }

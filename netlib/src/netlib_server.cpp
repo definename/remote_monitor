@@ -6,7 +6,8 @@ namespace netlib
 
 netlib_server::netlib_server(const unsigned short port)
 	: netlib_core(2)
-	, acceptor_(io_context_, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)) {
+	, acceptor_(io_context_, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
+	, netlib_sender_(netlib_mgr_) {
 	start();
 }
 
@@ -26,8 +27,10 @@ void netlib_server::start() {
 
 void netlib_server::stop() {
 	if (is_running()) {
-		NETLIB_INF("Netlib server is being stopped");
+		NETLIB_INF("Server is being stopped");
 		netlib_core::stop();
+		netlib_sender_.stop();
+		netlib_mgr_.release();
 	}
 }
 
@@ -41,12 +44,7 @@ void netlib_server::start_accept() {
 				set_socket_options(new_session->socket());
 				NETLIB_INF("New connection accepted...");
 
-				boost::asio::async_read_until(
-					new_session->socket(),
-					new_session->buffer(),
-					NETLIB_DELIMITER_VALUE,
-					boost::asio::bind_executor(io_strand_, boost::bind(&netlib_server::handle_receive,
-						this, new_session, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred)));
+				NETLIB_ASYNC_READ_UNTIL(netlib_server::handle_receive, new_session, io_strand_);
 			}
 			catch (const std::exception& e) {
 				NETLIB_ERR_FMT("Accept handler error: %s", WHAT_TO_STR(e));
@@ -68,7 +66,12 @@ void netlib_server::handle_receive(const netlib_session::pointer_t session, cons
 		if (payload.has_heartbeat()) {
 			NETLIB_INF("has_heartbeat");
 		} else if (payload.has_connect()) {
-			NETLIB_INF("has_connect");
+			auto connect = payload.mutable_connect();
+			session->set_session_id(boost::uuids::string_generator()(connect->session_id()));
+			netlib_mgr_.add(session);
+			connect->set_ready(true);
+			NETLIB_INF_FMT("Session:%s has been added", connect->session_id());
+			netlib_sender_.send(session->session_id(), payload);
 		} else if (payload.has_data()) {
 			NETLIB_INF("has_data");
 		} else {
@@ -76,12 +79,8 @@ void netlib_server::handle_receive(const netlib_session::pointer_t session, cons
 		}
 
 		session->buffer().consume(size);
-		boost::asio::async_read_until(
-			session->socket(),
-			session->buffer(),
-			NETLIB_DELIMITER_VALUE,
-			boost::asio::bind_executor(io_strand_, boost::bind(&netlib_server::handle_receive,
-				this, session, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred)));
+
+		NETLIB_ASYNC_READ_UNTIL(netlib_server::handle_receive, session, io_strand_);
 	}
 	catch (const std::exception& e) {
 		NETLIB_ERR_FMT("Receive handler error: %s", WHAT_TO_STR(e));

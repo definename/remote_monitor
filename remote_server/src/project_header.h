@@ -2,6 +2,7 @@
 
 // STD
 #include <iostream>
+#include <queue>
 
 // wxWidgets
 #include <wx/wxprec.h>
@@ -15,6 +16,7 @@
 #include "boost/uuid/uuid.hpp"
 #include "boost/uuid/nil_generator.hpp"
 #include "boost/uuid/random_generator.hpp"
+#include "boost/unordered_map.hpp"
 
 // Poco
 #include <Poco/LocalDateTime.h>

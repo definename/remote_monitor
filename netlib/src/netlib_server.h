@@ -3,6 +3,8 @@
 
 #include "netlib_core.h"
 #include "netlib_session.h"
+#include "netlib_mgr.h"
+#include "netlib_sender.h"
 
 namespace netlib
 {
@@ -30,7 +32,12 @@ private:
 
 	// Private members.
 private:
+	// Acceptor
 	boost::asio::ip::tcp::acceptor acceptor_;
+	// Session manager
+	netlib_mgr netlib_mgr_;
+	// Sender
+	netlib_sender netlib_sender_;
 };
 
 }

@@ -21,15 +21,17 @@ public:
 	void connect(const std::string& addr, const unsigned port);
 	// Stop client
 	void stop() override;
+	// Receiving handler
+	void handle_receive(const netlib_session::pointer_t session, const boost::system::error_code ec, std::size_t size);
 
 	// Private members
 private:
 	// Resolver
 	tcp_resolver resolver_;
-	// Sender
-	netlib_sender netlib_sender_;
 	// Session manager
 	netlib_mgr netlib_mgr_;
+	// Sender
+	netlib_sender netlib_sender_;
 };
 
 }

@@ -24,6 +24,7 @@ public:
 	tcp_socket_t& socket();
 	buff_t& buffer();
 	sessionid_t session_id() const;
+	void set_session_id(const netlib_session::sessionid_t& id);
 
 	// protected interface
 protected:
