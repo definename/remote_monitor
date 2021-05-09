@@ -35,6 +35,8 @@ protected:
 	const unsigned int workers_;
 	//! Is running
 	bool is_running_;
+	// Interface to generate random id
+	boost::uuids::random_generator id_generator_;
 };
 
 }

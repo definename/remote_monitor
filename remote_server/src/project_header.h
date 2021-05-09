@@ -12,6 +12,9 @@
 // Boost
 #include "boost/asio.hpp"
 #include "boost/enable_shared_from_this.hpp"
+#include "boost/uuid/uuid.hpp"
+#include "boost/uuid/nil_generator.hpp"
+#include "boost/uuid/random_generator.hpp"
 
 // Poco
 #include <Poco/LocalDateTime.h>
@@ -19,7 +22,7 @@
 #include <Poco/FormattingChannel.h>
 #include <Poco/PatternFormatter.h>
 
-// netlist
+// netlib
 #include "netlib_core.h"
 #include "netlib_server.h"
 

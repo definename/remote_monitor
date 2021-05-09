@@ -1,7 +1,6 @@
 #include "netlib_server.h"
-
-#define NETLIB_DELIMITER_VALUE protocol::Delimiter().default_instance().value()
-#define NETLIB_DELIMITER_SIZE NETLIB_DELIMITER_VALUE.size()
+#include "netlib_types.h"
+#include "netlib_util.h"
 
 namespace netlib
 {
@@ -34,24 +33,13 @@ void netlib_server::stop() {
 }
 
 void netlib_server::start_accept() {
-	netlib_session::pointer new_session = netlib_session::create(io_context_);
+	netlib_session::pointer_t new_session = netlib_session::create(io_context_);
 	acceptor_.async_accept(
 		new_session->socket(),
 		[new_session, this](const boost::system::error_code & ec) {
 			try {
-				if (ec) {
-					throw std::runtime_error(ec.message());
-				}
-
-				boost::system::error_code ecode;
-				new_session->socket().set_option(boost::asio::ip::tcp::no_delay(true), ecode);
-				if (ecode) {
-					throw std::runtime_error(ecode.message());
-				}
-				new_session->socket().set_option(boost::asio::socket_base::keep_alive(true), ecode);
-				if (ecode) {
-					throw std::runtime_error(ecode.message());
-				}
+				NETLIB_CHECK_SYSTEM_ERROR(ec);
+				set_socket_options(new_session->socket());
 				NETLIB_INF("New connection accepted...");
 
 				boost::asio::async_read_until(
@@ -68,13 +56,9 @@ void netlib_server::start_accept() {
 		});
 }
 
-void netlib_server::handle_receive(const netlib_session::pointer session, const boost::system::error_code ec, std::size_t size) {
+void netlib_server::handle_receive(const netlib_session::pointer_t session, const boost::system::error_code ec, std::size_t size) {
 	try {
-
-		if (ec) {
-			throw std::runtime_error(ec.message());
-		}
-
+		NETLIB_CHECK_SYSTEM_ERROR(ec);
 		protocol::Payload payload;
 		if (!payload.ParseFromArray(
 			boost::asio::buffer_cast<const unsigned char*>(session->buffer().data()),
@@ -83,7 +67,13 @@ void netlib_server::handle_receive(const netlib_session::pointer session, const 
 		}
 
 		if (payload.has_heartbeat()) {
-			NETLIB_INF("heartbeat received");
+			NETLIB_INF("has_heartbeat");
+		} else if (payload.has_connect()) {
+			NETLIB_INF("has_connect");
+		} else if (payload.has_data()) {
+			NETLIB_INF("has_data");
+		} else {
+			NETLIB_ERR("Invalid protocol");
 		}
 
 		session->buffer().consume(size);

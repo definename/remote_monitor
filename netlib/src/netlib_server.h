@@ -26,7 +26,7 @@ private:
 	// Accept new connection
 	void start_accept();
 	//
-	void handle_receive(const netlib_session::pointer session, const boost::system::error_code ec, std::size_t size);
+	void handle_receive(const netlib_session::pointer_t session, const boost::system::error_code ec, std::size_t size);
 
 	// Private members.
 private:

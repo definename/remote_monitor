@@ -1,17 +1,20 @@
 package netlib.protocol;
 
-message Delimiter
-{
+message Delimiter {
 	optional string value = 1 [default = "@сhunk"];
 }
 
-message Heartbeat
-{
-	optional bool ping = 1 [default = false];
-	optional bool pong = 2 [default = false];
+message Payload {
+	optional Connect connect = 1;
+	optional Heartbeat heartbeat = 2;
+	optional bytes data = 3;
 }
 
-message Payload {
-	optional Heartbeat heartbeat = 1;
-	optional bytes data = 2;
+message Connect {
+	optional string session_id = 1;
+}
+
+message Heartbeat {
+	optional bool ping = 1 [default = false];
+	optional bool pong = 2 [default = false];
 }

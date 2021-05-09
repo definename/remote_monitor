@@ -1,15 +1,20 @@
 project(netlib)
 
 set(SOURCE_FILES
+	src/netlib_client.cpp
 	src/netlib_server.cpp
 	src/netlib_session.cpp
 	src/netlib_core.cpp
+	src/netlib_util.cpp
 	)
-set(HEADER_FILES	
+set(HEADER_FILES
+	src/netlib_client.h
 	src/netlib_server.h
 	src/netlib_session.h
 	src/netlib_core.h
+	src/netlib_util.h
 	src/netlib_log.h
+	src/netlib_types.h
 	src/project_header.h
 	)
 
