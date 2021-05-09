@@ -11,6 +11,7 @@
 
 // Boost
 #include "boost/asio.hpp"
+#include "boost/enable_shared_from_this.hpp"
 
 // Poco
 #include <Poco/LocalDateTime.h>
@@ -25,5 +26,5 @@
 // zlib
 #include "zlib.h"
 
-// Protogen
+// Protobuf
 #include "Boss.pb.h"

@@ -22,4 +22,8 @@ netlib_session::tcp_socket& netlib_session::socket() {
 	return socket_;
 }
 
+netlib_session::buff& netlib_session::buffer() {
+	return buffer_;
+}
+
 }

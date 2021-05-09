@@ -5,6 +5,7 @@ namespace netlib
 
 netlib_core::netlib_core(const unsigned int workers /*= 1*/)
 	: io_work_(boost::asio::make_work_guard(io_context_))
+	, io_strand_(boost::asio::make_strand(io_context_))
 	, is_running_(false)
 	, workers_{workers} {
 }

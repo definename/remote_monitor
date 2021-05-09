@@ -23,15 +23,17 @@ protected:
 
 	// Protected data members.
 protected:
-	//! IO context.
+	//! IO context
 	boost::asio::io_context io_context_;
-	//! IO work.
+	// IO strand
+	boost::asio::strand<boost::asio::io_context::executor_type> io_strand_;
+	//! IO work
 	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> io_work_;
-	//! IO threads.
+	//! IO threads
 	std::vector<std::thread> threads_;
-	//! Workers count.
+	//! Workers count
 	const unsigned int workers_;
-	//! Is running.
+	//! Is running
 	bool is_running_;
 };
 

@@ -1,0 +1,5 @@
+package Viewport;
+
+message Frame {
+	optional string a = 1;
+}

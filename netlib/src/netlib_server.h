@@ -2,6 +2,7 @@
 #define NETLIB_SERVER
 
 #include "netlib_core.h"
+#include "netlib_session.h"
 
 namespace netlib
 {
@@ -24,6 +25,8 @@ public:
 private:
 	// Accept new connection
 	void start_accept();
+	//
+	void handle_receive(const netlib_session::pointer session, const boost::system::error_code ec, std::size_t size);
 
 	// Private members.
 private:
