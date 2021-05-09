@@ -13,7 +13,7 @@ public:
 
 	// Public interface
 public:
-	~netlib_session() = default;
+	~netlib_session();
 	netlib_session(const netlib_session&) = delete;
 	netlib_session(netlib_session&&) = delete;
 	netlib_session& operator=(const netlib_session&) = delete;

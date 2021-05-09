@@ -11,13 +11,15 @@ class netlib_client : public netlib_core {
 	// Public interface
 public:
 	// Constructor
-	netlib_client(const boost::uuids::uuid& id);
-	void connect(const boost::asio::ip::tcp::endpoint ep, const boost::uuids::uuid& id);
+	netlib_client();
+	// Destructor
+	~netlib_client();
+	// Interface to connect to given endpoint
+	void connect(const std::string& addr, const unsigned port);
 
 	// Private members
 private:
 	// Client id
-	boost::uuids::uuid id_;
 	tcp_resolver resolver_;
 };
 

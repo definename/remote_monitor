@@ -1,6 +1,8 @@
 #ifndef NETLIB_LOG
 #define NETLIB_LOG
 
+#define WHAT_TO_STR(e) std::string(e.what())
+
 #include <Poco/Logger.h>
 #include <Poco/Message.h>
 
@@ -26,7 +28,7 @@ Poco::Logger::get(NETLIB_POCO_LOGGER_NAME).log(Poco::Message(				\
 		NETLIB_POCO_LOGGER_SOURCE, msg, Poco::Message::PRIO_ERROR))			\
 
 #define NETLIB_ERR_FMT(fmt, ...)											\
-		NETLIB_ERR(Poco::format((fmt), (##__VA_ARGS__)))					\
+		NETLIB_ERR(Poco::format(fmt, ##__VA_ARGS__))						\
 
 #define NETLIB_WRN(msg)														\
 Poco::Logger::get(NETLIB_POCO_LOGGER_NAME).log(Poco::Message(				\
@@ -47,7 +49,7 @@ Poco::Logger::get(NETLIB_POCO_LOGGER_NAME).log(Poco::Message(				\
 		NETLIB_POCO_LOGGER_SOURCE, msg, Poco::Message::PRIO_INFORMATION))	\
 
 #define NETLIB_INF_FMT(fmt, ...)											\
-		NETLIB_INF(Poco::format((fmt), (##__VA_ARGS__)))					\
+		NETLIB_INF(Poco::format(fmt, ##__VA_ARGS__))						\
 
 #define NETLIB_DBG(msg)														\
 Poco::Logger::get(NETLIB_POCO_LOGGER_NAME).log(Poco::Message(				\

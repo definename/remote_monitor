@@ -1,6 +1,9 @@
 #ifndef NETLIB_UTIL
 #define NETLIB_UTIL
 
+#define NETLIB_DELIMITER_VALUE protocol::Delimiter().default_instance().value()
+#define NETLIB_DELIMITER_SIZE NETLIB_DELIMITER_VALUE.size()
+
 #define NETLIB_CHECK_SYSTEM_ERROR(ec)				\
 do													\
 {													\

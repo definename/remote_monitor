@@ -17,6 +17,7 @@
 #include "boost/uuid/uuid.hpp"
 #include "boost/uuid/nil_generator.hpp"
 #include "boost/uuid/random_generator.hpp"
+#include "boost/uuid/uuid_io.hpp"
 
 // protobuf
 #include "Protocol.pb.h"

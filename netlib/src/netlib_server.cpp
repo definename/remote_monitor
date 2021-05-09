@@ -1,5 +1,4 @@
 #include "netlib_server.h"
-#include "netlib_types.h"
 #include "netlib_util.h"
 
 namespace netlib
@@ -15,7 +14,7 @@ netlib_server::~netlib_server() {
 	try {
 		stop();
 	} catch (const std::exception& e) {
-		NETLIB_ERR_FMT("Server destruction error: %s", e.what());
+		NETLIB_ERR_FMT("Server destruction error: %s", WHAT_TO_STR(e));
 	}
 }
 
@@ -50,7 +49,7 @@ void netlib_server::start_accept() {
 						this, new_session, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred)));
 			}
 			catch (const std::exception& e) {
-				NETLIB_ERR_FMT("Accept handler error: %s", e.what());
+				NETLIB_ERR_FMT("Accept handler error: %s", WHAT_TO_STR(e));
 			}
 			start_accept();
 		});
@@ -85,7 +84,7 @@ void netlib_server::handle_receive(const netlib_session::pointer_t session, cons
 				this, session, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred)));
 	}
 	catch (const std::exception& e) {
-		NETLIB_ERR_FMT("Receive handler error: %s", e.what());
+		NETLIB_ERR_FMT("Receive handler error: %s", WHAT_TO_STR(e));
 	}
 }
 

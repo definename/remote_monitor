@@ -14,7 +14,6 @@ set(HEADER_FILES
 	src/netlib_core.h
 	src/netlib_util.h
 	src/netlib_log.h
-	src/netlib_types.h
 	src/project_header.h
 	)
 
