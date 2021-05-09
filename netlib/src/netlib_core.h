@@ -5,6 +5,11 @@ namespace netlib
 {
 
 class netlib_core {
+
+	// Public types
+public:
+	using strand_t = boost::asio::strand<boost::asio::io_context::executor_type>;
+
 	// Construction and destruction.
 public:
 	//! Constructor.

@@ -3,10 +3,9 @@
 
 #include "netlib_core.h"
 #include "netlib_mgr.h"
+#include "netlib_sender.h"
 
 namespace netlib {
-
-class netlib_mgr;
 
 class netlib_client : public netlib_core {
 	using tcp_resolver = boost::asio::ip::tcp::resolver;
@@ -27,6 +26,8 @@ public:
 private:
 	// Resolver
 	tcp_resolver resolver_;
+	// Sender
+	netlib_sender netlib_sender_;
 	// Session manager
 	netlib_mgr netlib_mgr_;
 };

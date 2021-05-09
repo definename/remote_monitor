@@ -2,6 +2,7 @@
 
 // STD
 #include <iostream>
+#include <queue>
 
 // wxWidgets
 #include <wx/wxprec.h>

@@ -6,7 +6,8 @@ namespace netlib {
 
 netlib_client::netlib_client()
 	: netlib_core(2)
-	, resolver_(io_context_) {
+	, resolver_(io_context_)
+	, netlib_sender_(netlib_mgr_) {
 	run();
 }
 
@@ -16,8 +17,9 @@ netlib_client::~netlib_client() {
 
 void netlib_client::stop() {
 	if (is_running()) {
-		netlib_mgr_.release();
 		netlib_core::stop();
+		netlib_sender_.stop();
+		netlib_mgr_.release();
 	}
 }
 
@@ -55,6 +57,7 @@ void netlib_client::connect(const std::string& addr, const unsigned port) {
 									protocol::Payload payload;
 									protocol::Connect* connect = payload.mutable_connect();
 									connect->set_session_id(boost::uuids::to_string(new_session->session_id()));
+									netlib_sender_.send(new_session->session_id(), payload);
 
 								} catch (const std::exception& e) {
 									NETLIB_ERR_FMT("Failed to connect to given endpoint:%s", WHAT_TO_STR(e));

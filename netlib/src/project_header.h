@@ -1,10 +1,12 @@
 #pragma once
 
 // stl
+#include <queue>
 #include <thread>
 #include <functional>
 #include <vector>
 #include <thread>
+#include <memory>
 
 // netlib
 #include "netlib_log.h"

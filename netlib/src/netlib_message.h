@@ -3,16 +3,19 @@
 
 namespace netlib {
 
-class message
+class netlib_message
 {
-	using buff_t = std::vector<unsigned int>;
+	// Public types
+public:
+	using buff_t = std::vector<unsigned char>;
+	using pointer = std::shared_ptr<netlib_message>;
 
 	// Public interface
 public:
 	//! Constructor.
-	message() = default;
+	netlib_message() = default;
 	//! Destructor.
-	~message();
+	~netlib_message();
 
 	//! Returns a direct pointer to the memory array used internally by the message.
 	buff_t::value_type* data();
@@ -31,9 +34,9 @@ private:
 };
 
 template <typename protobuf_t>
-void message::set_buff(protobuf_t msg) {
-	buffer_.resize(msg->ByteSize());
-	if (!msg->SerializeToArray(buffer_.data(), msg->ByteSize())) {
+void netlib_message::set_buff(protobuf_t msg) {
+	buffer_.resize(msg.ByteSize());
+	if (!msg.SerializeToArray(buffer_.data(), msg.ByteSize())) {
 		throw std::runtime_error("Failed to serialize with protobuf");
 	}
 }

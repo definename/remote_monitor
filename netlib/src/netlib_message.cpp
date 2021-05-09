@@ -3,19 +3,19 @@
 namespace netlib
 {
 
-message::~message() {
+netlib_message::~netlib_message() {
 	buff_t().swap(buffer_);
 }
 
-message::buff_t& message::buff() {
+netlib_message::buff_t& netlib_message::buff() {
 	return buffer_;
 }
 
-message::buff_t::value_type* message::data() {
+netlib_message::buff_t::value_type* netlib_message::data() {
 	return buffer_.data();
 }
 
-const size_t message::size() const {
+const size_t netlib_message::size() const {
 	return buffer_.size();
 }
 
