@@ -14,6 +14,13 @@ netlib_client::~netlib_client() {
 	stop();
 }
 
+void netlib_client::stop() {
+	if (is_running()) {
+		netlib_mgr_.release();
+		netlib_core::stop();
+	}
+}
+
 void netlib_client::connect(const std::string& addr, const unsigned port) {
 	if (!is_running()) {
 		NETLIB_ERR("Client io context is not running");
@@ -40,6 +47,15 @@ void netlib_client::connect(const std::string& addr, const unsigned port) {
 								try {
 									NETLIB_CHECK_SYSTEM_ERROR(ec);
 									NETLIB_INF("Client has been connected");
+
+									if (!netlib_mgr_.add(new_session)) {
+										throw std::runtime_error("Failed to add session with given id");
+									}
+
+									protocol::Payload payload;
+									protocol::Connect* connect = payload.mutable_connect();
+									connect->set_session_id(boost::uuids::to_string(new_session->session_id()));
+
 								} catch (const std::exception& e) {
 									NETLIB_ERR_FMT("Failed to connect to given endpoint:%s", WHAT_TO_STR(e));
 								}

@@ -4,6 +4,7 @@
 #include <thread>
 #include <functional>
 #include <vector>
+#include <thread>
 
 // netlib
 #include "netlib_log.h"
@@ -18,6 +19,7 @@
 #include "boost/uuid/nil_generator.hpp"
 #include "boost/uuid/random_generator.hpp"
 #include "boost/uuid/uuid_io.hpp"
+#include "boost/unordered_map.hpp"
 
 // protobuf
 #include "Protocol.pb.h"

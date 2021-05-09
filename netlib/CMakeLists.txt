@@ -6,6 +6,8 @@ set(SOURCE_FILES
 	src/netlib_session.cpp
 	src/netlib_core.cpp
 	src/netlib_util.cpp
+	src/netlib_message.cpp
+	src/netlib_mgr.cpp
 	)
 set(HEADER_FILES
 	src/netlib_client.h
@@ -13,6 +15,8 @@ set(HEADER_FILES
 	src/netlib_session.h
 	src/netlib_core.h
 	src/netlib_util.h
+	src/netlib_message.h
+	src/netlib_mgr.h
 	src/netlib_log.h
 	src/project_header.h
 	)
