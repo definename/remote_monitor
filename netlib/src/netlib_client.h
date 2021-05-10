@@ -21,6 +21,11 @@ public:
 	void connect(const std::string& addr, const unsigned port);
 	// Stop client
 	void stop() override;
+	// Send message to session with given id
+	template <typename protobuf_t>
+	void send(const netlib_session::sessionid_t& id, const protobuf_t& protobuf_msg) const;
+
+private:
 	// Receiving handler
 	void handle_receive(const netlib_session::pointer_t session, const boost::system::error_code ec, std::size_t size);
 
@@ -33,6 +38,11 @@ private:
 	// Sender
 	netlib_sender netlib_sender_;
 };
+
+template <typename protobuf_t>
+void netlib_client::send(const netlib_session::sessionid_t& id, const protobuf_t& protobuf_msg) const {
+	netlib_sender_.send(id, protobuf_msg);
+}
 
 }
 

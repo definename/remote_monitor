@@ -1,7 +1,6 @@
 #include "netlib_sender.h"
 #include "netlib_message.h"
 #include "netlib_mgr.h"
-#include "netlib_util.h"
 
 namespace netlib {
 
@@ -32,36 +31,6 @@ void netlib_sender::handle_send() {
 			}
 		}
 	}	
-}
-
-void netlib_sender::send(const netlib_session::sessionid_t& id, const protocol::Payload& payload) {
-	try {
-		auto session = netlib_mgr_.find(id);
-		netlib_message::pointer msg = std::make_shared<netlib_message>();
-		msg->set_buff<decltype(payload)>(payload);
-		send(id, msg);
-	}
-	catch (const std::exception & e) {
-		NETLIB_ERR_FMT("Failed to send protocol message:%s", WHAT_TO_STR(e));
-	}
-}
-
-void netlib_sender::send(const netlib_session::sessionid_t& id, netlib_message::pointer& msg) {
-	try {
-		netlib_session::pointer_t session = netlib_mgr_.find(id);
-		msg->buff().insert(
-			msg->buff().end(),
-			std::begin(NETLIB_DELIMITER_VALUE),
-			std::end(NETLIB_DELIMITER_VALUE));
-
-		{
-			std::unique_lock<std::mutex> l(mutex_);
-			sending_queue_.push({ msg, session });
-			cv_.notify_all();
-		}
-	} catch (const std::exception& e) {
-		NETLIB_ERR_FMT("Failed to send message:%s", WHAT_TO_STR(e));
-	}
 }
 
 void netlib_sender::stop() {

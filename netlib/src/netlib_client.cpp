@@ -99,7 +99,6 @@ void netlib_client::handle_receive(const netlib_session::pointer_t session, cons
 		}
 
 		session->buffer().consume(size);
-
 		NETLIB_ASYNC_READ_UNTIL(netlib_client::handle_receive, session, io_strand_);
 	}
 	catch (const std::exception & e) {

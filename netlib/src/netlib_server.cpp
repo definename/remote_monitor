@@ -34,6 +34,7 @@ void netlib_server::stop() {
 	}
 }
 
+
 void netlib_server::start_accept() {
 	netlib_session::pointer_t new_session = netlib_session::create(io_context_);
 	acceptor_.async_accept(
@@ -79,7 +80,6 @@ void netlib_server::handle_receive(const netlib_session::pointer_t session, cons
 		}
 
 		session->buffer().consume(size);
-
 		NETLIB_ASYNC_READ_UNTIL(netlib_server::handle_receive, session, io_strand_);
 	}
 	catch (const std::exception& e) {

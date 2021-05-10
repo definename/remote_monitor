@@ -3,6 +3,7 @@
 
 #include "netlib_session.h"
 #include "netlib_message.h"
+#include "netlib_util.h"
 
 namespace protocol {
 	class Payload;
@@ -29,9 +30,8 @@ public:
 	~netlib_sender() = default;
 
 	// Interface to send protocol message
-	void send(const netlib_session::sessionid_t& id, const protocol::Payload& payload);
-	// Interface to send message
-	void send(const netlib_session::sessionid_t& id, netlib_message::pointer& msg);
+	template <typename protobuf_t>
+	void send(const netlib_session::sessionid_t& id, const protobuf_t& protobuf_msg);
 	// Stops
 	void stop();
 
@@ -54,6 +54,28 @@ private:
 	// Is running flag
 	bool is_running_;
 };
+
+template <typename protobuf_t>
+void netlib_sender::send(const netlib_session::sessionid_t& id, const protobuf_t& protobuf_msg) {
+	try {
+		auto session = netlib_mgr_.find(id);
+		netlib_message::pointer msg = std::make_shared<netlib_message>();
+		msg->set_buff<protobuf_t>(protobuf_msg);
+		msg->buff().insert(
+			msg->buff().end(),
+			std::begin(NETLIB_DELIMITER_VALUE),
+			std::end(NETLIB_DELIMITER_VALUE));
+
+		{
+			std::unique_lock<std::mutex> l(mutex_);
+			sending_queue_.push({ msg, session });
+			cv_.notify_all();
+		}
+	}
+	catch (const std::exception & e) {
+		NETLIB_ERR_FMT("Failed to send protocol message:%s", WHAT_TO_STR(e));
+	}
+}
 
 }
 
