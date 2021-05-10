@@ -23,6 +23,7 @@
 #include "boost/uuid/uuid_io.hpp"
 #include "boost/uuid/string_generator.hpp"
 #include "boost/unordered_map.hpp"
+#include "boost/signals2.hpp"
 
 // protobuf
 #include "Protocol.pb.h"

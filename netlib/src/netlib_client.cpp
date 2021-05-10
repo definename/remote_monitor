@@ -84,17 +84,18 @@ void netlib_client::handle_receive(const netlib_session::pointer_t session, cons
 
 		if (payload.has_heartbeat()) {
 			NETLIB_INF("has_heartbeat");
-		}
-		else if (payload.has_connect()) {
+		} else if (payload.has_connect()) {
 			auto connect = payload.mutable_connect();
 			if (connect->has_ready() && connect->ready()) {
 				NETLIB_INF_FMT("Session has been initialized:%s", connect->session_id());
+				on_session_connected_(session->session_id());
 			}
-		}
-		else if (payload.has_data()) {
-			NETLIB_INF("has_data");
-		}
-		else {
+		} else if (payload.has_data()) {
+			on_session_received_(
+				session->session_id(),
+				reinterpret_cast<const netlib_message::buff_t::value_type*>(payload.data().c_str()),
+				payload.data().size());
+		} else {
 			NETLIB_ERR("Invalid protocol");
 		}
 
@@ -103,6 +104,8 @@ void netlib_client::handle_receive(const netlib_session::pointer_t session, cons
 	}
 	catch (const std::exception & e) {
 		NETLIB_ERR_FMT("Receive handler error: %s", WHAT_TO_STR(e));
+		netlib_mgr_.remove(session->session_id());
+		on_session_disconnected_(session->session_id());
 	}
 }
 

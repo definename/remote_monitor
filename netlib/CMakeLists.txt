@@ -9,6 +9,7 @@ set(SOURCE_FILES
 	src/netlib_message.cpp
 	src/netlib_mgr.cpp
 	src/netlib_sender.cpp
+	src/netlib_signal.cpp
 	)
 set(HEADER_FILES
 	src/netlib_client.h
@@ -18,9 +19,11 @@ set(HEADER_FILES
 	src/netlib_util.h
 	src/netlib_message.h
 	src/netlib_mgr.h
+	src/netlib_sender.h
+	src/netlib_signal.h
+	
 	src/netlib_log.h
 	src/project_header.h
-	src/netlib_sender.h
 	)
 
 source_group("Source files" FILES ${SOURCE_FILES})

@@ -34,7 +34,6 @@ void netlib_server::stop() {
 	}
 }
 
-
 void netlib_server::start_accept() {
 	netlib_session::pointer_t new_session = netlib_session::create(io_context_);
 	acceptor_.async_accept(
@@ -73,8 +72,12 @@ void netlib_server::handle_receive(const netlib_session::pointer_t session, cons
 			connect->set_ready(true);
 			NETLIB_INF_FMT("Session:%s has been added", connect->session_id());
 			netlib_sender_.send(session->session_id(), payload);
+			on_session_connected_(session->session_id());
 		} else if (payload.has_data()) {
-			NETLIB_INF("has_data");
+			on_session_received_(
+				session->session_id(),
+				reinterpret_cast<const netlib_message::buff_t::value_type*>(payload.data().c_str()),
+				payload.data().size());
 		} else {
 			NETLIB_ERR("Invalid protocol");
 		}
@@ -84,6 +87,8 @@ void netlib_server::handle_receive(const netlib_session::pointer_t session, cons
 	}
 	catch (const std::exception& e) {
 		NETLIB_ERR_FMT("Receive handler error: %s", WHAT_TO_STR(e));
+		netlib_mgr_.remove(session->session_id());
+		on_session_disconnected_(session->session_id());
 	}
 }
 

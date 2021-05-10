@@ -1,4 +1,4 @@
-package Viewport;
+package netlib.viewport;
 
 message Frame {
 	optional string a = 1;

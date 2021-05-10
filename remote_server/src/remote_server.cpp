@@ -19,43 +19,29 @@ int remote_server::main(const ArgVec& args) {
 
 		logger().information("Server is being started...");
 		netlib_server_ = std::make_shared<netlib::netlib_server>(49160);
+		netlib_server_->do_on_session_connected([this](const netlib::netlib_session::sessionid_t& id) {
+			logger().information("Connected...");
+			});
+		netlib_server_->do_on_session_disconnected([this](const netlib::netlib_session::sessionid_t& id) {
+			logger().information("Disconnected..."); });
+		netlib_server_->do_on_session_received([this](
+			const netlib::netlib_session::sessionid_t& id,
+			const netlib::netlib_message::buff_t::value_type* data,
+			const std::size_t bytes) {
+				try {
+					logger().information("Data received...");
+					netlib::viewport::Frame frame;
+					if (!frame.ParseFromArray(data, bytes)) {
+						logger().error("Failed to parse with protocol buffer");
+					}
+					logger().information(Poco::format("%s", frame.a()));
+					frame.set_a("Wellcome!!!");
+					netlib_server_->send(id, frame);
+				} catch (const std::exception& e) {
+					logger().error(Poco::format("Receiving handler error:%s", WHAT_TO_STR(e)));
+				}
+			});
 
-
-// 		std::cout << "zlib version: " << zlib_version << std::endl;
-// 
-// 		std::string archive;
-// 
-// 		// Serialization.
-// 		{
-// 			Rich::Boss boss;
-// 			boss.set_first_name("Ivan");
-// 			boss.set_last_name("Durak");
-// 
-// 			for (int i = 0; i != 3; ++i)
-// 			{
-// 				auto slave = boss.add_slave();
-// 				slave->set_number(i);
-// 			}
-// 
-// 			if (!boss.SerializeToString(&archive)) {
-// 				throw std::runtime_error("Failed to serialize with protobuf");
-// 			}
-// 		}
-// 
-// 		// De-serialization.
-// 		{
-// 			Rich::Boss boss;
-// 			if (!boss.ParseFromString(archive)) {
-// 				throw std::runtime_error("Failed to parse with protobuf");
-// 			}
-// 
-// 			std::cout << boss.first_name() << " " << boss.last_name() << std::endl;
-// 			for (int i = 0; i < boss.slave_size(); ++i)
-// 			{
-// 				auto slave = boss.slave(i);
-// 				std::cout << "Slave number: " << slave.number() << std::endl;
-// 			}
-// 		}
 		waitForTerminationRequest();
 
 	} catch (const std::exception& e) {

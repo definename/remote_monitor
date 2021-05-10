@@ -4,10 +4,7 @@
 #include "netlib_session.h"
 #include "netlib_message.h"
 #include "netlib_util.h"
-
-namespace protocol {
-	class Payload;
-}
+#include "netlib_log.h"
 
 namespace netlib {
 

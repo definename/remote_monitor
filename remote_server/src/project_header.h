@@ -17,6 +17,7 @@
 #include "boost/uuid/nil_generator.hpp"
 #include "boost/uuid/random_generator.hpp"
 #include "boost/unordered_map.hpp"
+#include "boost/signals2.hpp"
 
 // Poco
 #include <Poco/LocalDateTime.h>
@@ -32,4 +33,4 @@
 #include "zlib.h"
 
 // Protobuf
-#include "Boss.pb.h"
+#include "Viewport.pb.h"
