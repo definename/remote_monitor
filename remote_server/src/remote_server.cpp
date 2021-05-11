@@ -44,6 +44,7 @@ int remote_server::main(const ArgVec& args) {
 
 		// Take screenshot
 		wxImage::AddHandler(new wxPNGHandler);
+
 // 		wxDisplay primary_display;
 // 		wxRect primary_rect = primary_display.GetGeometry();
 // 		wxBitmap screenShot(primary_rect.GetWidth(), primary_rect.GetHeight(), 24);
@@ -52,13 +53,13 @@ int remote_server::main(const ArgVec& args) {
 // 		wxScreenDC dcScreen;
 // 		memDC.Blit(0, 0, screenShot.GetWidth(), screenShot.GetHeight(), &dcScreen, 0, 0, wxRasterOperationMode(wxCOPY), true);
 // 		memDC.SelectObject(wxNullBitmap);
-// 		screenShot.SaveFile("screenshot1.png", wxBITMAP_TYPE_PNG);
+// 		screenShot.SaveFile("current.png", wxBITMAP_TYPE_PNG);
 
-		wxImage current("screenshot.png", wxBITMAP_TYPE_PNG);
+		wxImage current("current.png", wxBITMAP_TYPE_PNG);
 		if (!current.IsOk()) {
 			throw std::runtime_error("Failed to load img");
 		}
-		wxImage previous("screenshot1.png", wxBITMAP_TYPE_PNG);
+		wxImage previous("previous.png", wxBITMAP_TYPE_PNG);
 		if (!previous.IsOk()) {
 			throw std::runtime_error("Failed to load img1");
 		}
@@ -73,10 +74,10 @@ int remote_server::main(const ArgVec& args) {
 		wxRect rect;
 		for (int y = 0; y < current.GetHeight(); ++y) {
 			for (int x = 0; x < current.GetWidth(); ++x) {
-				if (current.GetRed(x, y) != previous.GetRed(x, y) || current.GetGreen(x, y) != previous.GetGreen(x, y) || current.GetBlue(x, y) != previous.GetBlue(x, y)) {
-					logger().information(Poco::format("x=:%d y=:%d", x, y));
-					rect.SetX(x);
-					rect.SetY(y);
+				if (current.GetRed(x, y) != previous.GetRed(x, y) ||
+					current.GetGreen(x, y) != previous.GetGreen(x, y) ||
+					current.GetBlue(x, y) != previous.GetBlue(x, y)) {
+					rect.SetTop(y);
 					done = true;
 					break;
 				}
@@ -86,74 +87,63 @@ int remote_server::main(const ArgVec& args) {
 			}
 		}
 
-// 		for (int y = 0; y < current.GetHeight(); ++y) {
-// 			for (int x = 0; x < current.GetWidth(); ++x) {
-// 				if (current.GetRed(x, y) != previous.GetRed(x, y) ||
-// 					current.GetGreen(x, y) != previous.GetGreen(x, y) ||
-// 					current.GetBlue(x, y) != previous.GetBlue(x, y)) {
-// 					rect.SetBottom(current.GetHeight() - y);
-// 					done = true;
-// 					break;
-// 				}
-// 			}
-// 			if (done) {
-// 				break;
-// 			}
-// 		}
-// 
-// 		done = false;
-// 		for (int y = current.GetHeight() - 1; y >= 0; --y) {
-// 			for (int x = 0; x < current.GetWidth(); ++x) {
-// 				if (current.GetRed(x, y) != previous.GetRed(x, y) ||
-// 					current.GetGreen(x, y) != previous.GetGreen(x, y) ||
-// 					current.GetBlue(x, y) != previous.GetBlue(x, y)) {
-// 					int offset = current.GetHeight() - y - 2;
-// 					rect.SetTop(offset < 0 ? 0 : offset);
-// 					done = true;
-// 					break;
-// 				}
-// 			}
-// 			if (done) {
-// 				break;
-// 			}
-// 		}
-// 
-// 		done = false;
-// 		for (int x = 0; x < current.GetWidth(); ++x) {
-// 			for (int y = 0; y < current.GetHeight(); ++y) {
-// 				if (current.GetRed(x, y) != previous.GetRed(x, y) ||
-// 					current.GetGreen(x, y) != previous.GetGreen(x, y) ||
-// 					current.GetBlue(x, y) != previous.GetBlue(x, y)) {
-// 					rect.SetLeft(x);
-// 					done = true;
-// 					break;
-// 				}
-// 			}
-// 			if (done) {
-// 				break;
-// 			}
-// 		}
-// 
-// 		done = false;
-// 		for (int x = current.GetWidth() - 1; x >= 0; x--) {
-// 			for (int y = 0; y < current.GetHeight(); ++y) {
-// 				if (current.GetRed(x, y) != previous.GetRed(x, y) ||
-// 					current.GetGreen(x, y) != previous.GetGreen(x, y) ||
-// 					current.GetBlue(x, y) != previous.GetBlue(x, y)) {
-// 					rect.SetRight((x + 2) > current.GetWidth() ? x : (x + 2));
-// 					done = true;
-// 					break;
-// 				}
-// 			}
-// 			if (done) {
-// 				break;
-// 			}
-// 		}
+		done = false;
+		for (int x = 0; x < current.GetWidth(); ++x) {
+			for (int y = 0; y < current.GetHeight(); ++y) {
+				if (current.GetRed(x, y) != previous.GetRed(x, y) ||
+					current.GetGreen(x, y) != previous.GetGreen(x, y) ||
+					current.GetBlue(x, y) != previous.GetBlue(x, y)) {
+					rect.SetLeft(x);
+					done = true;
+					break;
+				}
+			}
+			if (done) {
+				break;
+			}
+		}
 
-		rect.SetWidth(current.GetWidth() - rect.x);
-		rect.SetHeight(current.GetHeight() - rect.y);
-		wxImage sub = current.GetSubImage(rect);
-		sub.SaveFile("screenshot_sub.png");
+		done = false;
+		for (int y = current.GetHeight() - 1; y >= 0; --y) {
+			for (int x = current.GetWidth() - 1; x >= 0 ; --x) {
+				if (current.GetRed(x, y) != previous.GetRed(x, y) ||
+					current.GetGreen(x, y) != previous.GetGreen(x, y) ||
+					current.GetBlue(x, y) != previous.GetBlue(x, y)) {
+					rect.SetBottom(y);
+					done = true;
+					break;
+				}
+			}
+			if (done) {
+				break;
+			}
+		}
+
+		done = false;
+		for (int x = current.GetWidth() - 1; x >= 0; x--) {
+			for (int y = current.GetHeight() - 1; y >= 0; --y) {
+				if (current.GetRed(x, y) != previous.GetRed(x, y) ||
+					current.GetGreen(x, y) != previous.GetGreen(x, y) ||
+					current.GetBlue(x, y) != previous.GetBlue(x, y)) {
+					rect.SetRight(x);
+					done = true;
+					break;
+				}
+			}
+			if (done) {
+				break;
+			}
+		}
+
+		if (rect != wxRect()) {
+			wxImage sub = current.GetSubImage(rect);
+			sub.SaveFile("diff.png", wxBITMAP_TYPE_PNG);
+
+			previous.Paste(sub, rect.GetX(), rect.GetY());
+			previous.SaveFile("like_current.png", wxBITMAP_TYPE_PNG);
+		} else {
+			logger().information("Equal");
+		}
 
 		//waitForTerminationRequest();
 
