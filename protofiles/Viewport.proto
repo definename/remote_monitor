@@ -1,5 +1,10 @@
 package netlib.viewport;
 
 message Frame {
-	optional string a = 1;
+	required bool fullscreen = 1;
+	optional uint32 x = 2 [default = 0];
+	optional uint32 y = 3 [default = 0];
+	optional uint32 width = 4 [default = 0];
+	optional uint32 height = 5 [default = 0];
+	optional bytes data = 6;
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+//#include "netlib_session.h"
+
 namespace gui
 {
 
@@ -13,7 +15,7 @@ public:
 	~client_panel() = default;
 
 	// Public interface.
-public:
+private:
 	// Control event handler.
 	//void OnControl(wxCommandEvent& e);
 
