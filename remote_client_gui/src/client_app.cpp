@@ -16,6 +16,8 @@ bool client_app::OnInit(void) {
 		return false;
 	}
 
+	wxImage::AddHandler(new wxPNGHandler);
+
 	frame_ = new client_frame();
 	return frame_->Show(true);
 }

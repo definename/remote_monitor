@@ -11,6 +11,7 @@
 #endif 
 
 #include <wx/display.h>
+#include <wx/mstream.h>
 
 // Boost
 #include "boost/asio.hpp"

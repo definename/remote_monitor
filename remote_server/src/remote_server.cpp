@@ -10,6 +10,9 @@ remote_server::remote_server()
 int remote_server::main(const ArgVec& args) {
 
 	try {
+		// Enable png support
+		wxImage::AddHandler(new wxPNGHandler);
+
 		logger().setLevel("trace");
 		Poco::AutoPtr<Poco::PatternFormatter> formatter =
 			new Poco::PatternFormatter("%L%Y-%m-%d %H:%M:%S.%i %s [%p] %t");
@@ -36,6 +39,23 @@ int remote_server::main(const ArgVec& args) {
 							wxRect r = wxDisplay().GetGeometry();
 							frame.set_width(r.GetWidth());
 							frame.set_height(r.GetHeight());
+
+							wxBitmap screenShot(r.GetWidth(), r.GetHeight(), 24);
+							wxMemoryDC memDC;
+							memDC.SelectObject(screenShot);
+							wxScreenDC dcScreen;
+							memDC.Blit(0, 0, screenShot.GetWidth(), screenShot.GetHeight(), &dcScreen, 0, 0, wxRasterOperationMode(wxCOPY), true);
+							memDC.SelectObject(wxNullBitmap);
+
+							wxImage img = screenShot.ConvertToImage();
+							wxMemoryOutputStream outStream;
+							img.SaveFile(outStream, wxBITMAP_TYPE_PNG);
+							wxMemoryInputStream inputStream(outStream);
+							size_t size(inputStream.GetSize());
+							std::vector<unsigned char> bytes(size);
+							inputStream.Read(&bytes[0], size);
+							frame.set_data(&bytes[0], size);
+
 							netlib_server_->send(id, frame);
 						}
 					} else {

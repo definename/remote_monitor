@@ -10,6 +10,8 @@
     #include <wx/wx.h>
 #endif 
 
+#include <wx/mstream.h>
+
 // Boost
 #include "boost/asio.hpp"
 #include "boost/enable_shared_from_this.hpp"

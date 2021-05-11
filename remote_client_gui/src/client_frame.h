@@ -3,9 +3,6 @@
 namespace gui
 {
 
-// Forward declaration.
-class client_panel;
-
 // Define custom command event
 class netlib_event;
 wxDECLARE_EVENT(NETLIB_EVENT_TYPE, netlib_event);
@@ -19,6 +16,9 @@ public:
 		: wxCommandEvent(event) {
 		this->width_ = event.width_;
 		this->height_ = event.height_;
+		this->img_ = event.img_;
+		this->x_ = event.x_;
+		this->y_ = event.y_;
 	}
 	// Required for sending with wxPostEvent()
 	wxEvent* Clone() const {
@@ -26,11 +26,17 @@ public:
 	}
 	int width_;
 	int height_;
+	int x_;
+	int y_;
+	wxImage img_;
 };
 
 typedef void (wxEvtHandler::* netlib_event_function)(netlib_event&);
 #define netlib_event_handler(func) wxEVENT_HANDLER_CAST(netlib_event_function, func)
 #define EVT_MYFOO(id, func) wx__DECLARE_EVT1(NETLIB_EVENT_TYPE, id, netlib_event_handler(func))
+
+// Forward declaration.
+class client_panel;
 
 class client_frame: public wxFrame
 {
