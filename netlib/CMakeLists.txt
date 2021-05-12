@@ -52,6 +52,7 @@ target_link_libraries(${PROJECT_NAME}
 		)
 add_dependencies(${PROJECT_NAME}
 	pocoproject
+	protogen
 	)
 set(NETLIB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/netlib/src PARENT_SCOPE)
 set(NETLIB_LIBRARIES ${PROJECT_NAME} PARENT_SCOPE)

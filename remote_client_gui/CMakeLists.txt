@@ -1,5 +1,7 @@
 project(remote_client_gui)
 
+configure_file(src/res/app.rc.cmake app.rc @ONLY)
+
 set(SOURCE_FILES
 	src/client_frame.cpp
 	src/client_app.cpp
@@ -11,13 +13,21 @@ set(HEADER_FILES
 	src/client_app.h
 	src/client_panel.h
 	)
+set(RESOURCE_FILES
+	src/res/frame.ico
+	${CMAKE_CURRENT_BINARY_DIR}/app.rc
+	)
+
+set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/app.rc PROPERTIES GENERATED 1)
 
 source_group("Source files" FILES ${SOURCE_FILES})
 source_group("Header files" FILES ${HEADER_FILES})
+source_group("Resource Files" FILES ${RESOURCE_FILES})
 
 add_executable(${PROJECT_NAME} WIN32
 	${SOURCE_FILES}
 	${HEADER_FILES}
+	${RESOURCE_FILES}
 	)
 
 target_precompile_headers(${PROJECT_NAME}
@@ -45,7 +55,7 @@ target_link_libraries(${PROJECT_NAME}
 		)
 add_dependencies(${PROJECT_NAME}
 	pocoproject
-	netlib
 	protogen
+	netlib
 	)
 add_compile_definitions(WIN32_LEAN_AND_MEAN)

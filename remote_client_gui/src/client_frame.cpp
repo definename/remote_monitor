@@ -14,6 +14,8 @@ client_frame::client_frame()
 	, panel_(new client_panel(this))
 	, netlib_client_(std::make_shared<netlib::netlib_client>()) {
 
+	SetIcon(wxICON(FRAME_ICON));
+
 	Bind(wxEVT_CLOSE_WINDOW, &client_frame::OnClose, this);
 
 	netlib_client_->connect(boost::asio::ip::host_name(), 49160);

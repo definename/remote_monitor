@@ -186,6 +186,7 @@ void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 			frame.set_fullscreen(false);
 			frame.set_width(rect.GetWidth());
 			frame.set_height(rect.GetHeight());
+			LOG_INF_FMT("Send image width:%d height:%d", rect.GetWidth(), rect.GetHeight());
 			frame.set_x(rect.GetX());
 			frame.set_y(rect.GetY());
 			frame.set_data(&container[0], container.size());

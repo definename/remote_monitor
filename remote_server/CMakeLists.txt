@@ -41,7 +41,7 @@ target_link_libraries(${PROJECT_NAME}
 		)
 add_dependencies(${PROJECT_NAME}
 	pocoproject
-	netlib
 	protogen
+	netlib
 	)
 add_compile_definitions(WIN32_LEAN_AND_MEAN)
