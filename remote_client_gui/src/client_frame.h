@@ -53,7 +53,8 @@ public:
 	using client_panel_ptr = client_panel*;
 	// netlib event type
 	enum netlib_event_t {
-		NETLIB_FULLSCREEN = 99
+		NETLIB_FULLSCREEN = 99,
+		NETLIB_SUB_IMAGE
 	};
 
 	// Private interface.

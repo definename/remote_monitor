@@ -48,20 +48,18 @@ void client_frame::on_session_received(
 	try {
 		netlib::viewport::Frame frame;
 		if (frame.ParseFromArray(data, bytes)) {
+			netlib_event e(NETLIB_EVENT_TYPE, netlib_event_t::NETLIB_SUB_IMAGE);
 			if (frame.fullscreen()) {
-				netlib_event e(NETLIB_EVENT_TYPE, netlib_event_t::NETLIB_FULLSCREEN);
-				e.width_ = frame.width();
-				e.height_ = frame.height();
-				e.x_ = frame.x();
-				e.y_ = frame.y();
-
-				wxMemoryInputStream is(reinterpret_cast<const void*>(frame.data().data()), frame.data().size());
-				e.img_ = wxImage(is, wxBITMAP_TYPE_PNG);
-
-				wxPostEvent(this, e);
-			} else {
-
+				e.SetId(netlib_event_t::NETLIB_FULLSCREEN);
 			}
+			e.width_ = frame.width();
+			e.height_ = frame.height();
+			e.x_ = frame.x();
+			e.y_ = frame.y();
+
+			wxMemoryInputStream is(reinterpret_cast<const void*>(frame.data().data()), frame.data().size());
+			e.img_ = wxImage(is, wxBITMAP_TYPE_PNG);
+			wxPostEvent(this, e);
 		} else {
 			//logger().error("Failed to parse with protocol buffer");
 		}
@@ -74,13 +72,14 @@ void client_frame::on_session_received(
 void client_frame::on_netlib_event_handler(netlib_event& e) {
 	if (e.GetId() == netlib_event_t::NETLIB_FULLSCREEN) {
 		SetSize(e.width_, e.height_);
-		wxRect r;
-		r.SetWidth(e.width_);
-		r.SetHeight(e.height_);
-		r.SetX(e.x_);
-		r.SetY(e.y_);
-		panel_->update_screen(e.img_, r, true);
 	}
+
+	wxRect r;
+	r.SetWidth(e.width_);
+	r.SetHeight(e.height_);
+	r.SetX(e.x_);
+	r.SetY(e.y_);
+	panel_->update_screen(e.img_, r, e.GetId() == netlib_event_t::NETLIB_FULLSCREEN);
 }
 
 }

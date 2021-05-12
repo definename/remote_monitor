@@ -37,9 +37,12 @@ void client_panel::update_screen(const wxImage& img, const wxRect& r, bool is_fu
 	if (is_fullscreen) {
 		image_.Resize(r.GetSize(), r.GetPosition());
 	}
+// 	static int count = 0;
+// 	img.SaveFile(Poco::format("img\\sub_image%d.png", count), wxBITMAP_TYPE_PNG);
 	image_.Paste(img, r.GetX(), r.GetY());
 	wxClientDC dc(this);
 	render(dc);
+//	count++;
 }
 
 }
