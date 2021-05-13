@@ -31,6 +31,9 @@ int remote_server::main(const ArgVec& args) {
 
 	try {
 		wxImage::AddHandler(new wxPNGHandler);
+// 		wxImage::AddHandler(new wxBMPHandler);
+// 		wxImage::AddHandler(new wxJPEGHandler);
+// 		wxImage::AddHandler(new wxTIFFHandler);
 
 		logger().setLevel("trace");
 		Poco::AutoPtr<Poco::PatternFormatter> formatter =
@@ -64,6 +67,11 @@ int remote_server::main(const ArgVec& args) {
 							frame.set_data(&container[0], container.size());
 							frame.set_width(viewport::primary_display_.GetWidth());
 							frame.set_height(viewport::primary_display_.GetHeight());
+
+							img.SaveFile("screen_image_png.png", wxBITMAP_TYPE_PNG);
+// 							img.SaveFile("screen_image_bpm.bpm", wxBITMAP_TYPE_BMP);
+// 							img.SaveFile("screen_image_jpeg.jpeg", wxBITMAP_TYPE_JPEG);
+// 							img.SaveFile("screen_image_tiff.tiff", wxBITMAP_TYPE_TIFF);
 
 							send(id, frame);
 							viewport::do_send do_send = std::bind(&remote_server::send, this, std::placeholders::_1, std::placeholders::_2);
