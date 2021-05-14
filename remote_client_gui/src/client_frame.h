@@ -33,7 +33,7 @@ public:
 
 typedef void (wxEvtHandler::* netlib_event_function)(netlib_event&);
 #define netlib_event_handler(func) wxEVENT_HANDLER_CAST(netlib_event_function, func)
-#define EVT_MYFOO(id, func) wx__DECLARE_EVT1(NETLIB_EVENT_TYPE, id, netlib_event_handler(func))
+#define EVT_NETLIB(id, func) wx__DECLARE_EVT1(NETLIB_EVENT_TYPE, id, netlib_event_handler(func))
 
 // Forward declaration.
 class client_panel;

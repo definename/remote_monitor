@@ -6,7 +6,7 @@ namespace gui
 wxDEFINE_EVENT(NETLIB_EVENT_TYPE, netlib_event);
 
 wxBEGIN_EVENT_TABLE(client_frame, wxFrame)
-	EVT_MYFOO(wxID_ANY, client_frame::on_netlib_event_handler)
+	EVT_NETLIB(wxID_ANY, client_frame::on_netlib_event_handler)
 wxEND_EVENT_TABLE()
 
 client_frame::client_frame()
@@ -27,7 +27,7 @@ client_frame::client_frame()
 	wxMenu* menuAlgorithm = new wxMenu;
 	menuFile->AppendSubMenu(menuAlgorithm, wxT("Algorithm"));
 
-	// Sub menu baby
+	// Sub menu algorithm
 	wxMenuItem* diff_simple = new wxMenuItem(menuAlgorithm, algorithm_t::DIFF_SIMPLE, wxT("Diff Simple"));
 	//addItem->SetBitmap(wxArtProvider::GetBitmap(wxART_NEW));
 	menuAlgorithm->Append(diff_simple);
@@ -82,7 +82,6 @@ void client_frame::on_session_connected(const netlib::netlib_session::sessionid_
 }
 
 void client_frame::on_session_disconnected(const netlib::netlib_session::sessionid_t& id) {
-	//logger().information("Disconnected...");
 	id_ = boost::uuids::nil_uuid();
 }
 
