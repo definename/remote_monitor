@@ -56,11 +56,18 @@ public:
 		NETLIB_FULLSCREEN = 99,
 		NETLIB_SUB_IMAGE
 	};
+	// algorithm type
+	enum algorithm_t {
+		DIFF_SIMPLE = 99,
+		DIFF_CHUNKED
+	};
 
 	// Private interface.
 private:
-	// On close event handler
-	void OnClose(wxCloseEvent& e);
+	// Close event handler
+	void on_close(wxCloseEvent&);
+	// Menu event handler
+	void on_menu(wxCommandEvent&);
 
 	// netlib session connected
 	void on_session_connected(const netlib::netlib_session::sessionid_t&);
@@ -83,6 +90,8 @@ private:
 	client_panel_ptr panel_;
 	// netlib pointer
 	std::shared_ptr<netlib::netlib_client> netlib_client_;
+	// Active session id
+	netlib::netlib_session::sessionid_t id_;
 };
 
 };

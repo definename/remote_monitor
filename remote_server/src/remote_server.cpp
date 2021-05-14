@@ -60,13 +60,15 @@ int remote_server::main(const ArgVec& args) {
 					LOG_INF("Data received...");
 					netlib::viewport::Frame frame;
 					if (frame.ParseFromArray(data, bytes)) {
-						if (frame.fullscreen()) {
+						if (frame.type() == netlib::viewport::Frame_Type_Start) {
 							wxImage img = viewport::make_screenshot_image();
 							viewport::bytes container;
 							viewport::save_image_to_container(img, container);
+							frame.set_type(netlib::viewport::Frame_Type_Data);
 							frame.set_data(&container[0], container.size());
 							frame.set_width(viewport::primary_display_.GetWidth());
 							frame.set_height(viewport::primary_display_.GetHeight());
+							frame.set_fullscreen(true);
 
 							img.SaveFile("screen_image_png.png", wxBITMAP_TYPE_PNG);
 // 							img.SaveFile("screen_image_bpm.bpm", wxBITMAP_TYPE_BMP);
@@ -77,6 +79,12 @@ int remote_server::main(const ArgVec& args) {
 							viewport::do_send do_send = std::bind(&remote_server::send, this, std::placeholders::_1, std::placeholders::_2);
 							viewport_ = std::make_shared<viewport>(id, img, do_send);
 							viewport_->start();
+						} else if (frame.type() == netlib::viewport::Frame_Type_Algorith_Diff_Chunked) {
+							viewport_->set_algorithm(viewport::algorithm_t::VIEWPORT_DIFF_CHUNKED);
+							LOG_INF("Change algorithm to diff chunked");
+						} else if (frame.type() == netlib::viewport::Frame_Type_Algorith_Diff_Simple) {
+							viewport_->set_algorithm(viewport::algorithm_t::VIEWPORT_DIFF_SIMPLE);
+							LOG_INF("Change algorithm to diff simple");
 						}
 					} else {
 						LOG_ERR("Failed to parse with protocol buffer");
@@ -105,7 +113,8 @@ viewport::viewport(const netlib::netlib_session::sessionid_t& id, wxImage& previ
 	, id_(id)
 	, previous_(previous)
 	, send_handler_(send_handler)
-	, timer_(io_context_) {
+	, timer_(io_context_)
+	, algorithm_(viewport::algorithm_t::VIEWPORT_DIFF_CHUNKED) {
 	run();
 }
 
@@ -122,6 +131,7 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 		int part_size = width / parts;
 		int residue = width % parts;
 
+		bool is_diff = false;
 		for (int i = 0; i < parts; ++i) {
 			int offset = part_size * i;
 			int part_width = (residue && (i == parts - 1)) ? part_size + residue : part_size;
@@ -192,32 +202,18 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 			}
 
 			if (rect != wxRect()) {
-				//static int count = 0;
-				wxImage sub = current.GetSubImage(rect);
-				viewport::bytes container;
-				viewport::save_image_to_container(sub, container);
-				netlib::viewport::Frame frame;
-				frame.set_fullscreen(false);
-				frame.set_width(rect.GetWidth());
-				frame.set_height(rect.GetHeight());
-				LOG_INF_FMT("Send image width:%d height:%d", rect.GetWidth(), rect.GetHeight());
-				frame.set_x(rect.GetX());
-				frame.set_y(rect.GetY());
-				frame.set_data(&container[0], container.size());
-				//sub.SaveFile(Poco::format("img\\sub_image%d.png", count), wxBITMAP_TYPE_PNG);
-				//count++;
-				send_handler_(id_, frame);
-			}
-			else {
+				screen_data_pack_and_send(current.GetSubImage(rect), rect);
+				is_diff = true;
+			} else {
 				LOG_INF("Nothing to send...");
 			}
 		}
-		previous_.Destroy();
-		previous_ = current;
+		if (is_diff) {
+			previous_.Destroy();
+			previous_ = current;
+		}
 	}
-
-	timer_.expires_after(std::chrono::milliseconds(300));
-	timer_.async_wait(std::bind(&viewport::screen_diff_handler_chunked, this, std::placeholders::_1));
+	start();
 }
 
 void viewport::screen_diff_handler(const boost::system::error_code& ec) {
@@ -295,36 +291,36 @@ void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 		}
 
 		if (rect != wxRect()) {
-			//static int count = 0;
-			wxImage sub = current.GetSubImage(rect);
+			screen_data_pack_and_send(current.GetSubImage(rect), rect);
 			previous_.Destroy();
 			previous_ = current;
-			viewport::bytes container;
-			viewport::save_image_to_container(sub, container);
-			netlib::viewport::Frame frame;
-			frame.set_fullscreen(false);
-			frame.set_width(rect.GetWidth());
-			frame.set_height(rect.GetHeight());
-			LOG_INF_FMT("Send image width:%d height:%d", rect.GetWidth(), rect.GetHeight());
-			frame.set_x(rect.GetX());
-			frame.set_y(rect.GetY());
-			frame.set_data(&container[0], container.size());
-			//sub.SaveFile(Poco::format("img\\sub_image%d.png", count), wxBITMAP_TYPE_PNG);
-			//count++;
-			send_handler_(id_, frame);
 		} else {
 			LOG_INF("Nothing to send...");
 		}
 	}
+	start();
+}
 
-	timer_.expires_after(std::chrono::milliseconds(300));
-	timer_.async_wait(std::bind(&viewport::screen_diff_handler, this, std::placeholders::_1));
+void viewport::screen_data_pack_and_send(const wxImage& img, const wxRect& rect) const {
+	//static int count = 0;
+	viewport::bytes container;
+	viewport::save_image_to_container(img, container);
+	netlib::viewport::Frame frame;
+	frame.set_width(rect.GetWidth());
+	frame.set_height(rect.GetHeight());
+	frame.set_x(rect.GetX());
+	frame.set_y(rect.GetY());
+	frame.set_data(&container[0], container.size());
+	frame.set_type(netlib::viewport::Frame_Type_Data);
+	//sub.SaveFile(Poco::format("img\\sub_image%d.png", count), wxBITMAP_TYPE_PNG);
+	//count++;
+	LOG_INF_FMT("Send image width:%d height:%d", rect.GetWidth(), rect.GetHeight());
+	send_handler_(id_, frame);
 }
 
 void viewport::start() {
-	timer_.expires_after(std::chrono::milliseconds(1000));
-	timer_.async_wait(std::bind(&viewport::screen_diff_handler_chunked, this, std::placeholders::_1));
-	//timer_.async_wait(std::bind(&viewport::screen_diff_handler, this, std::placeholders::_1));
+	timer_.expires_after(std::chrono::milliseconds(300));
+	set_screen_diff_handler();
 }
 
 void viewport::stop() {
@@ -355,6 +351,20 @@ void viewport::save_image_to_container(const wxImage& img, viewport::bytes& cont
 	size_t size(inputStream.GetSize());
 	container.resize(size);
 	inputStream.Read(&container[0], size);
+}
+
+void viewport::set_algorithm(const algorithm_t& algorithm) {
+	algorithm_ = algorithm;
+}
+
+void viewport::set_screen_diff_handler() {
+	if (algorithm_ == algorithm_t::VIEWPORT_DIFF_SIMPLE) {
+		timer_.async_wait(std::bind(&viewport::screen_diff_handler, this, std::placeholders::_1));
+	} else if (algorithm_ == algorithm_t::VIEWPORT_DIFF_CHUNKED) {
+		timer_.async_wait(std::bind(&viewport::screen_diff_handler_chunked, this, std::placeholders::_1));
+	} else {
+		LOG_ERR("Unknown algorithm");
+	}
 }
 
 }

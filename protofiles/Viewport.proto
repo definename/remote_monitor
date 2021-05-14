@@ -1,10 +1,17 @@
 package netlib.viewport;
 
 message Frame {
-	required bool fullscreen = 1;
+	enum Type {
+		Start = 1;
+		Algorith_Diff_Simple = 2;
+		Algorith_Diff_Chunked = 3;
+		Data = 4;
+	}
+	optional bool fullscreen = 1 [default = false];
 	optional uint32 x = 2 [default = 0];
 	optional uint32 y = 3 [default = 0];
 	optional uint32 width = 4 [default = 0];
 	optional uint32 height = 5 [default = 0];
 	optional bytes data = 6;
+	optional Type type = 7;
 }
