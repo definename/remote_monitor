@@ -73,7 +73,7 @@ void client_frame::on_session_received(
 
 void client_frame::on_netlib_event_handler(netlib_event& e) {
 	if (e.GetId() == netlib_event_t::NETLIB_FULLSCREEN) {
-		SetSize(e.width_, e.height_);
+		SetClientSize(e.width_, e.height_);
 	}
 
 	wxRect r;

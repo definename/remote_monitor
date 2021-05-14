@@ -34,6 +34,8 @@ public:
 private:
 	// Screen diff handler
 	void screen_diff_handler(const boost::system::error_code& e);
+	// Screen diff handler chunked
+	void screen_diff_handler_chunked(const boost::system::error_code& ec);
 
 private:
 	// Session id to send to

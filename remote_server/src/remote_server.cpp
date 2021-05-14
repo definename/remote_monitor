@@ -109,6 +109,117 @@ viewport::viewport(const netlib::netlib_session::sessionid_t& id, wxImage& previ
 	run();
 }
 
+void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) {
+	if (ec == boost::asio::error::operation_aborted) {
+		LOG_INF("Monitor exit...");
+		return;
+	}
+
+	if (timer_.expiry() < boost::asio::steady_timer::clock_type::now()) {
+		wxImage current = viewport::make_screenshot_image();
+		int width = current.GetWidth();
+		int parts = (width >= 200) ? 10 : 1;
+		int part_size = width / parts;
+		int residue = width % parts;
+
+		for (int i = 0; i < parts; ++i) {
+			int offset = part_size * i;
+			int part_width = (residue && (i == parts - 1)) ? part_size + residue : part_size;
+
+			bool done = false;
+			wxRect rect;
+			for (int y = 0; y < current.GetHeight(); ++y) {
+				for (int x = 0; x < part_width; ++x) {
+					if (current.GetRed(x + offset, y) != previous_.GetRed(x + offset, y) ||
+						current.GetGreen(x + offset, y) != previous_.GetGreen(x + offset, y) ||
+						current.GetBlue(x + offset, y) != previous_.GetBlue(x + offset, y)) {
+						rect.SetTop(y);
+						done = true;
+						break;
+					}
+				}
+				if (done) {
+					break;
+				}
+			}
+
+			done = false;
+			for (int x = 0; x < part_width; ++x) {
+				for (int y = 0; y < current.GetHeight(); ++y) {
+					if (current.GetRed(x + offset, y) != previous_.GetRed(x + offset, y) ||
+						current.GetGreen(x + offset, y) != previous_.GetGreen(x + offset, y) ||
+						current.GetBlue(x + offset, y) != previous_.GetBlue(x + offset, y)) {
+						rect.SetLeft(x + offset);
+						done = true;
+						break;
+					}
+				}
+				if (done) {
+					break;
+				}
+			}
+
+			done = false;
+			for (int y = current.GetHeight() - 1; y >= 0; --y) {
+				for (int x = part_width - 1; x >= 0; --x) {
+					if (current.GetRed(x + offset, y) != previous_.GetRed(x + offset, y) ||
+						current.GetGreen(x + offset, y) != previous_.GetGreen(x + offset, y) ||
+						current.GetBlue(x + offset, y) != previous_.GetBlue(x + offset, y)) {
+						rect.SetBottom(y);
+						done = true;
+						break;
+					}
+				}
+				if (done) {
+					break;
+				}
+			}
+
+			done = false;
+			for (int x = part_width - 1; x >= 0; x--) {
+				for (int y = current.GetHeight() - 1; y >= 0; --y) {
+					if (current.GetRed(x + offset, y) != previous_.GetRed(x + offset, y) ||
+						current.GetGreen(x + offset, y) != previous_.GetGreen(x + offset, y) ||
+						current.GetBlue(x + offset, y) != previous_.GetBlue(x + offset, y)) {
+						rect.SetRight(x + offset);
+						done = true;
+						break;
+					}
+				}
+				if (done) {
+					break;
+				}
+			}
+
+			if (rect != wxRect()) {
+				//static int count = 0;
+				wxImage sub = current.GetSubImage(rect);
+				viewport::bytes container;
+				viewport::save_image_to_container(sub, container);
+				netlib::viewport::Frame frame;
+				frame.set_fullscreen(false);
+				frame.set_width(rect.GetWidth());
+				frame.set_height(rect.GetHeight());
+				LOG_INF_FMT("Send image width:%d height:%d", rect.GetWidth(), rect.GetHeight());
+				frame.set_x(rect.GetX());
+				frame.set_y(rect.GetY());
+				frame.set_data(&container[0], container.size());
+				//sub.SaveFile(Poco::format("img\\sub_image%d.png", count), wxBITMAP_TYPE_PNG);
+				//count++;
+				send_handler_(id_, frame);
+			}
+			else {
+				LOG_INF("Nothing to send...");
+			}
+		}
+		previous_.Destroy();
+		previous_ = current;
+	}
+
+	timer_.expires_after(std::chrono::milliseconds(300));
+	timer_.async_wait(std::bind(&viewport::screen_diff_handler_chunked, this, std::placeholders::_1));
+}
+
 void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 	if (ec == boost::asio::error::operation_aborted) {
 		LOG_INF("Monitor exit...");
@@ -212,7 +323,8 @@ void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 
 void viewport::start() {
 	timer_.expires_after(std::chrono::milliseconds(1000));
-	timer_.async_wait(std::bind(&viewport::screen_diff_handler, this, std::placeholders::_1));
+	timer_.async_wait(std::bind(&viewport::screen_diff_handler_chunked, this, std::placeholders::_1));
+	//timer_.async_wait(std::bind(&viewport::screen_diff_handler, this, std::placeholders::_1));
 }
 
 void viewport::stop() {
