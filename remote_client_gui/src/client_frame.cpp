@@ -102,7 +102,9 @@ void client_frame::on_session_received(
 				e.x_ = frame.x();
 				e.y_ = frame.y();
 
-				wxMemoryInputStream is(reinterpret_cast<const void*>(frame.data().data()), frame.data().size());
+				wxMemoryInputStream is(
+					reinterpret_cast<const void*>(frame.data().data()),
+					frame.data().size());
 				e.img_ = wxImage(is, wxBITMAP_TYPE_PNG);
 				wxPostEvent(this, e);
 			}

@@ -120,12 +120,12 @@ viewport::viewport(const netlib::netlib_session::sessionid_t& id, wxImage& previ
 	run();
 }
 
-void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) {
+void viewport::screen_diff_handler_chunked(
+	const boost::system::error_code& ec) {
 	if (ec == boost::asio::error::operation_aborted) {
 		LOG_INF("Monitor exit...");
 		return;
 	}
-
 	if (timer_.expiry() < boost::asio::steady_timer::clock_type::now()) {
 		wxImage current = viewport::make_screenshot_image();
 		int width = current.GetWidth();
@@ -136,13 +136,15 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 		bool is_diff = false;
 		for (int i = 0; i < parts; ++i) {
 			int offset = part_size * i;
-			int part_width = (residue && (i == parts - 1)) ? part_size + residue : part_size;
+			bool is_true = residue && (i == parts - 1);
+			int part_width = (is_true) ? part_size + residue : part_size;
 
 			bool done = false;
 			wxRect rect;
 			for (int y = 0; y < current.GetHeight(); ++y) {
 				for (int x = 0; x < part_width; ++x) {
-					if (!are_pixels_equal(current, previous_, x + offset, y)) {
+					if (!are_pixels_equal(
+						current, previous_, x + offset, y)) {
 						rect.SetTop(y);
 						done = true;
 						break;
@@ -152,16 +154,15 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 					break;
 				}
 			}
-
 			if (!done) {
 				LOG_INF_FMT("Nothing to send in part:%d ...", i);
 				continue;
 			}
-
 			done = false;
 			for (int x = 0; x < part_width; ++x) {
 				for (int y = 0; y < current.GetHeight(); ++y) {
-					if (!are_pixels_equal(current, previous_, x + offset, y)) {
+					if (!are_pixels_equal(
+						current, previous_, x + offset, y)) {
 						rect.SetLeft(x + offset);
 						done = true;
 						break;
@@ -171,11 +172,11 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 					break;
 				}
 			}
-
 			done = false;
 			for (int y = current.GetHeight() - 1; y >= 0; --y) {
 				for (int x = part_width - 1; x >= 0; --x) {
-					if (!are_pixels_equal(current, previous_, x + offset, y)) {
+					if (!are_pixels_equal(
+						current, previous_, x + offset, y)) {
 						rect.SetBottom(y);
 						done = true;
 						break;
@@ -185,11 +186,11 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 					break;
 				}
 			}
-
 			done = false;
 			for (int x = part_width - 1; x >= 0; x--) {
 				for (int y = current.GetHeight() - 1; y >= 0; --y) {
-					if (!are_pixels_equal(current, previous_, x + offset, y)) {
+					if (!are_pixels_equal(
+						current, previous_, x + offset, y)) {
 						rect.SetRight(x + offset);
 						done = true;
 						break;
@@ -201,7 +202,8 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 			}
 
 			if (rect != wxRect()) {
-				screen_data_pack_and_send(current.GetSubImage(rect), rect);
+				screen_data_pack_and_send(
+					current.GetSubImage(rect), rect);
 				is_diff = true;
 			} else {
 				LOG_INF("Nothing to send...");

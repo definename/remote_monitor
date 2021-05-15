@@ -44,7 +44,8 @@ private:
 };
 
 template <typename protobuf_t>
-void netlib_client::send(const netlib_session::sessionid_t& id, const protobuf_t& protobuf_msg) {
+void netlib_client::send(
+	const netlib_session::sessionid_t& id,const protobuf_t& protobuf_msg) {
 	std::string data_msg;
 	if (!protobuf_msg.SerializeToString(&data_msg)) {
 		throw std::runtime_error("Failed to serialize with protobuf");
