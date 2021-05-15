@@ -28,6 +28,8 @@ public:
 	static wxImage make_screenshot_image();
 	// Save image to container to transfer
 	static void save_image_to_container(const wxImage& img, viewport::bytes& container);
+	// Checks whether two pixels are equal
+	static bool are_pixels_equal(const wxImage& current, const wxImage& previous, const int x, const int y);
 
 	// Public interface
 public:

@@ -19,6 +19,8 @@ Poco::Logger::get(MONITOR_POCO_LOGGER_NAME).log(Poco::Message(				\
 
 #define LOG_WHAT2STR(e) std::string(e.what())
 
+#define SCREEN_DEPTH 24
+
 namespace server {
 
 remote_server::remote_server()
@@ -140,9 +142,7 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 			wxRect rect;
 			for (int y = 0; y < current.GetHeight(); ++y) {
 				for (int x = 0; x < part_width; ++x) {
-					if (current.GetRed(x + offset, y) != previous_.GetRed(x + offset, y) ||
-						current.GetGreen(x + offset, y) != previous_.GetGreen(x + offset, y) ||
-						current.GetBlue(x + offset, y) != previous_.GetBlue(x + offset, y)) {
+					if (!are_pixels_equal(current, previous_, x + offset, y)) {
 						rect.SetTop(y);
 						done = true;
 						break;
@@ -156,9 +156,7 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 			done = false;
 			for (int x = 0; x < part_width; ++x) {
 				for (int y = 0; y < current.GetHeight(); ++y) {
-					if (current.GetRed(x + offset, y) != previous_.GetRed(x + offset, y) ||
-						current.GetGreen(x + offset, y) != previous_.GetGreen(x + offset, y) ||
-						current.GetBlue(x + offset, y) != previous_.GetBlue(x + offset, y)) {
+					if (!are_pixels_equal(current, previous_, x + offset, y)) {
 						rect.SetLeft(x + offset);
 						done = true;
 						break;
@@ -172,9 +170,7 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 			done = false;
 			for (int y = current.GetHeight() - 1; y >= 0; --y) {
 				for (int x = part_width - 1; x >= 0; --x) {
-					if (current.GetRed(x + offset, y) != previous_.GetRed(x + offset, y) ||
-						current.GetGreen(x + offset, y) != previous_.GetGreen(x + offset, y) ||
-						current.GetBlue(x + offset, y) != previous_.GetBlue(x + offset, y)) {
+					if (!are_pixels_equal(current, previous_, x + offset, y)) {
 						rect.SetBottom(y);
 						done = true;
 						break;
@@ -188,9 +184,7 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 			done = false;
 			for (int x = part_width - 1; x >= 0; x--) {
 				for (int y = current.GetHeight() - 1; y >= 0; --y) {
-					if (current.GetRed(x + offset, y) != previous_.GetRed(x + offset, y) ||
-						current.GetGreen(x + offset, y) != previous_.GetGreen(x + offset, y) ||
-						current.GetBlue(x + offset, y) != previous_.GetBlue(x + offset, y)) {
+					if (!are_pixels_equal(current, previous_, x + offset, y)) {
 						rect.SetRight(x + offset);
 						done = true;
 						break;
@@ -229,9 +223,7 @@ void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 		wxRect rect;
 		for (int y = 0; y < current.GetHeight(); ++y) {
 			for (int x = 0; x < current.GetWidth(); ++x) {
-				if (current.GetRed(x, y) != previous_.GetRed(x, y) ||
-					current.GetGreen(x, y) != previous_.GetGreen(x, y) ||
-					current.GetBlue(x, y) != previous_.GetBlue(x, y)) {
+				if (!are_pixels_equal(current, previous_, x, y)) {
 					rect.SetTop(y);
 					done = true;
 					break;
@@ -245,9 +237,7 @@ void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 		done = false;
 		for (int x = 0; x < current.GetWidth(); ++x) {
 			for (int y = 0; y < current.GetHeight(); ++y) {
-				if (current.GetRed(x, y) != previous_.GetRed(x, y) ||
-					current.GetGreen(x, y) != previous_.GetGreen(x, y) ||
-					current.GetBlue(x, y) != previous_.GetBlue(x, y)) {
+				if (!are_pixels_equal(current, previous_, x, y)) {
 					rect.SetLeft(x);
 					done = true;
 					break;
@@ -261,9 +251,7 @@ void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 		done = false;
 		for (int y = current.GetHeight() - 1; y >= 0; --y) {
 			for (int x = current.GetWidth() - 1; x >= 0 ; --x) {
-				if (current.GetRed(x, y) != previous_.GetRed(x, y) ||
-					current.GetGreen(x, y) != previous_.GetGreen(x, y) ||
-					current.GetBlue(x, y) != previous_.GetBlue(x, y)) {
+				if (!are_pixels_equal(current, previous_, x, y)) {
 					rect.SetBottom(y);
 					done = true;
 					break;
@@ -277,9 +265,7 @@ void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 		done = false;
 		for (int x = current.GetWidth() - 1; x >= 0; x--) {
 			for (int y = current.GetHeight() - 1; y >= 0; --y) {
-				if (current.GetRed(x, y) != previous_.GetRed(x, y) ||
-					current.GetGreen(x, y) != previous_.GetGreen(x, y) ||
-					current.GetBlue(x, y) != previous_.GetBlue(x, y)) {
+				if (!are_pixels_equal(current, previous_, x, y)) {
 					rect.SetRight(x);
 					done = true;
 					break;
@@ -335,11 +321,23 @@ void viewport::stop() {
 }
 
 wxImage viewport::make_screenshot_image() {
-	wxBitmap screenShot(primary_display_.GetWidth(), primary_display_.GetHeight(), 24);
+	wxBitmap screenShot(
+		primary_display_.GetWidth(),
+		primary_display_.GetHeight(),
+		SCREEN_DEPTH);
 	wxMemoryDC memDC;
 	memDC.SelectObject(screenShot);
 	wxScreenDC dcScreen;
-	memDC.Blit(0, 0, screenShot.GetWidth(), screenShot.GetHeight(), &dcScreen, 0, 0, wxRasterOperationMode(wxCOPY), true);
+	memDC.Blit(
+		0,
+		0,
+		screenShot.GetWidth(),
+		screenShot.GetHeight(),
+		&dcScreen,
+		0,
+		0,
+		wxRasterOperationMode(wxCOPY),
+		true);
 	memDC.SelectObject(wxNullBitmap);
 	return screenShot.ConvertToImage();
 }
@@ -365,6 +363,15 @@ void viewport::set_screen_diff_handler() {
 	} else {
 		LOG_ERR("Unknown algorithm");
 	}
+}
+
+bool viewport::are_pixels_equal(const wxImage& current, const wxImage& previous, const int x, const int y) {
+	if (current.GetRed(x, y) == previous.GetRed(x, y) ||
+		current.GetGreen(x, y) == previous.GetGreen(x, y) ||
+		current.GetBlue(x, y) == previous.GetBlue(x, y)) {
+		return true;
+	}
+	return false;
 }
 
 }
