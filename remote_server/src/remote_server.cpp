@@ -153,6 +153,11 @@ void viewport::screen_diff_handler_chunked(const boost::system::error_code& ec) 
 				}
 			}
 
+			if (!done) {
+				LOG_INF_FMT("Nothing to send in part:%d ...", i);
+				continue;
+			}
+
 			done = false;
 			for (int x = 0; x < part_width; ++x) {
 				for (int y = 0; y < current.GetHeight(); ++y) {
@@ -233,6 +238,11 @@ void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 				break;
 			}
 		}
+		if (!done) {
+			start();
+			LOG_INF("Nothing to send...");
+			return;
+		}
 
 		done = false;
 		for (int x = 0; x < current.GetWidth(); ++x) {
@@ -247,10 +257,9 @@ void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 				break;
 			}
 		}
-
 		done = false;
 		for (int y = current.GetHeight() - 1; y >= 0; --y) {
-			for (int x = current.GetWidth() - 1; x >= 0 ; --x) {
+			for (int x = current.GetWidth() - 1; x >= 0; --x) {
 				if (!are_pixels_equal(current, previous_, x, y)) {
 					rect.SetBottom(y);
 					done = true;
@@ -261,7 +270,6 @@ void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 				break;
 			}
 		}
-
 		done = false;
 		for (int x = current.GetWidth() - 1; x >= 0; x--) {
 			for (int y = current.GetHeight() - 1; y >= 0; --y) {
@@ -280,7 +288,8 @@ void viewport::screen_diff_handler(const boost::system::error_code& ec) {
 			screen_data_pack_and_send(current.GetSubImage(rect), rect);
 			previous_.Destroy();
 			previous_ = current;
-		} else {
+		}
+		else {
 			LOG_INF("Nothing to send...");
 		}
 	}
