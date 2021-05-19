@@ -72,7 +72,7 @@ int remote_server::main(const ArgVec& args) {
 							frame.set_height(viewport::primary_display_.GetHeight());
 							frame.set_fullscreen(true);
 
-							img.SaveFile("screen_image_png.png", wxBITMAP_TYPE_PNG);
+//							img.SaveFile("screen_image_png.png", wxBITMAP_TYPE_PNG);
 // 							img.SaveFile("screen_image_bpm.bpm", wxBITMAP_TYPE_BMP);
 // 							img.SaveFile("screen_image_jpeg.jpeg", wxBITMAP_TYPE_JPEG);
 // 							img.SaveFile("screen_image_tiff.tiff", wxBITMAP_TYPE_TIFF);
