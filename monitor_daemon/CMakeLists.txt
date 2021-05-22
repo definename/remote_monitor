@@ -1,10 +1,13 @@
-project(remote_client)
+project(monitor_daemon)
 
 set(SOURCE_FILES
-	src/remote_client.cpp
+	src/monitor_main.cpp
+	src/monitor_viewport.cpp
 	)
 set(HEADER_FILES
-	src/remote_client.h
+	src/monitor_main.h
+	src/monitor_viewport.h
+	src/monitor_log.h
 	src/project_header.h
 	)
 

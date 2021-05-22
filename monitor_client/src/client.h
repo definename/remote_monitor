@@ -1,7 +1,7 @@
 #ifndef REMOTE_SERVER
 #define REMOTE_SERVER
 
-namespace server {
+namespace client {
 
 class remote_client: public Poco::Util::ServerApplication {
 public:
@@ -14,6 +14,6 @@ private:
 
 }
 
-POCO_SERVER_MAIN(server::remote_client)
+POCO_SERVER_MAIN(client::remote_client)
 
 #endif

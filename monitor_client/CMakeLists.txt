@@ -1,10 +1,10 @@
-project(remote_server)
+project(monitor_client)
 
 set(SOURCE_FILES
-	src/remote_server.cpp
+	src/client.cpp
 	)
 set(HEADER_FILES
-	src/remote_server.h
+	src/client.h
 	src/project_header.h
 	)
 

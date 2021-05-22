@@ -1,6 +1,6 @@
-#include "remote_client.h"
+#include "client.h"
 
-namespace server {
+namespace client {
 
 remote_client::remote_client()
 : Poco::Util::ServerApplication()

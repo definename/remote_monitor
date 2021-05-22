@@ -1,4 +1,4 @@
-project(remote_client_gui)
+project(monitor_client_gui)
 
 configure_file(src/res/app.rc.cmake app.rc @ONLY)
 

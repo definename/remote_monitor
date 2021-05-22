@@ -1,7 +1,4 @@
-#ifndef REMOTE_SERVER
-#define REMOTE_SERVER
-
-namespace server {
+namespace screen {
 
 class viewport : public netlib::netlib_core {
 	// Public types
@@ -65,21 +62,4 @@ private:
 	algorithm_t algorithm_;
 };
 
-class remote_server: public Poco::Util::ServerApplication {
-public:
-	remote_server();
-	int main(const ArgVec& args) override;
-
-private:
-	void send(const netlib::netlib_session::sessionid_t&, const netlib::viewport::Frame&);
-
-private:
-	std::shared_ptr<netlib::netlib_server> netlib_server_;
-	std::shared_ptr<viewport> viewport_;
-};
-
 }
-
-POCO_SERVER_MAIN(server::remote_server)
-
-#endif
