@@ -21,8 +21,8 @@ set(HEADER_FILES
 	src/netlib_mgr.h
 	src/netlib_sender.h
 	src/netlib_signal.h
-	
 	src/netlib_log.h
+	src/netlib.h
 	src/project_header.h
 	)
 
